@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.2.0-stable",
+	Version = "1.3.0-stable",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -73,6 +73,96 @@ index3.Theme = table.clone(({
 		["Section Background 2"] = Color3.fromRGB(14, 14, 16), Accent = Color3.fromRGB(170, 85, 255), Element = Color3.fromRGB(16, 16, 18),
 	},
 	}).Preset)
+
+-- Stable built-in theme presets. You can add more presets at runtime with RegisterTheme().
+index3.Themes = {
+	["XDFLEX"] = {
+		Accent = Color3.fromRGB(170, 85, 255),
+		AccentGradient = Color3.fromRGB(0, 220, 255),
+		Background = Color3.fromRGB(12, 12, 14),
+		["Background 2"] = Color3.fromRGB(10, 10, 12),
+		Text = Color3.fromRGB(235, 235, 235),
+		Outline = Color3.fromRGB(25, 25, 28),
+		["Section Top"] = Color3.fromRGB(28, 26, 32),
+		["Section Background"] = Color3.fromRGB(10, 10, 12),
+		["Section Background 2"] = Color3.fromRGB(14, 14, 16),
+		Element = Color3.fromRGB(16, 16, 18),
+	},
+	["Midnight"] = {
+		Accent = Color3.fromRGB(118, 92, 255),
+		AccentGradient = Color3.fromRGB(73, 145, 255),
+		Background = Color3.fromRGB(9, 10, 16),
+		["Background 2"] = Color3.fromRGB(7, 8, 13),
+		Text = Color3.fromRGB(236, 238, 248),
+		Outline = Color3.fromRGB(28, 30, 43),
+		["Section Top"] = Color3.fromRGB(22, 23, 34),
+		["Section Background"] = Color3.fromRGB(9, 10, 16),
+		["Section Background 2"] = Color3.fromRGB(13, 14, 21),
+		Element = Color3.fromRGB(17, 18, 27),
+	},
+	["Ocean"] = {
+		Accent = Color3.fromRGB(0, 196, 255),
+		AccentGradient = Color3.fromRGB(57, 108, 255),
+		Background = Color3.fromRGB(8, 13, 18),
+		["Background 2"] = Color3.fromRGB(6, 10, 15),
+		Text = Color3.fromRGB(231, 244, 250),
+		Outline = Color3.fromRGB(22, 35, 44),
+		["Section Top"] = Color3.fromRGB(16, 27, 35),
+		["Section Background"] = Color3.fromRGB(8, 13, 18),
+		["Section Background 2"] = Color3.fromRGB(11, 19, 25),
+		Element = Color3.fromRGB(13, 23, 30),
+	},
+	["Rose"] = {
+		Accent = Color3.fromRGB(255, 82, 151),
+		AccentGradient = Color3.fromRGB(191, 87, 255),
+		Background = Color3.fromRGB(16, 10, 14),
+		["Background 2"] = Color3.fromRGB(12, 8, 11),
+		Text = Color3.fromRGB(247, 235, 242),
+		Outline = Color3.fromRGB(40, 25, 35),
+		["Section Top"] = Color3.fromRGB(31, 20, 27),
+		["Section Background"] = Color3.fromRGB(16, 10, 14),
+		["Section Background 2"] = Color3.fromRGB(22, 14, 19),
+		Element = Color3.fromRGB(26, 16, 22),
+	},
+	["Emerald"] = {
+		Accent = Color3.fromRGB(36, 214, 139),
+		AccentGradient = Color3.fromRGB(0, 181, 209),
+		Background = Color3.fromRGB(8, 14, 13),
+		["Background 2"] = Color3.fromRGB(6, 11, 10),
+		Text = Color3.fromRGB(232, 246, 241),
+		Outline = Color3.fromRGB(22, 38, 34),
+		["Section Top"] = Color3.fromRGB(17, 30, 27),
+		["Section Background"] = Color3.fromRGB(8, 14, 13),
+		["Section Background 2"] = Color3.fromRGB(11, 20, 18),
+		Element = Color3.fromRGB(14, 25, 22),
+	},
+	["Amber"] = {
+		Accent = Color3.fromRGB(255, 173, 51),
+		AccentGradient = Color3.fromRGB(255, 93, 76),
+		Background = Color3.fromRGB(16, 13, 9),
+		["Background 2"] = Color3.fromRGB(12, 10, 7),
+		Text = Color3.fromRGB(248, 241, 229),
+		Outline = Color3.fromRGB(41, 34, 23),
+		["Section Top"] = Color3.fromRGB(32, 27, 18),
+		["Section Background"] = Color3.fromRGB(16, 13, 9),
+		["Section Background 2"] = Color3.fromRGB(23, 19, 13),
+		Element = Color3.fromRGB(27, 22, 15),
+	},
+	["Mono"] = {
+		Accent = Color3.fromRGB(220, 220, 225),
+		AccentGradient = Color3.fromRGB(125, 125, 135),
+		Background = Color3.fromRGB(10, 10, 11),
+		["Background 2"] = Color3.fromRGB(7, 7, 8),
+		Text = Color3.fromRGB(235, 235, 237),
+		Outline = Color3.fromRGB(30, 30, 33),
+		["Section Top"] = Color3.fromRGB(24, 24, 27),
+		["Section Background"] = Color3.fromRGB(10, 10, 11),
+		["Section Background 2"] = Color3.fromRGB(14, 14, 16),
+		Element = Color3.fromRGB(18, 18, 20),
+	},
+}
+index3.CurrentTheme = "XDFLEX"
+
 local function ensureFolder(path)
 	if type(isfolder) ~= "function" or type(makefolder) ~= "function" then
 		return false
@@ -822,6 +912,59 @@ index3.RefreshConfigsList = function(arg, listbox)
 	return configs
 end
 
+
+index3.GetThemeNames = function(arg)
+	local names = {}
+	for name in pairs(arg.Themes or {}) do
+		table.insert(names, name)
+	end
+	table.sort(names)
+	return names
+end
+
+index3.RegisterTheme = function(arg, name, theme)
+	if type(name) ~= "string" or name == "" or type(theme) ~= "table" then
+		return false
+	end
+	arg.Themes[name] = table.clone(theme)
+	return true
+end
+
+index3.ApplyTheme = function(arg, name)
+	local preset = arg.Themes and arg.Themes[name]
+	if type(preset) ~= "table" then
+		return false
+	end
+
+	-- Assign the complete preset first so function-backed theme entries
+	-- (gradients, etc.) never render with a half-applied theme.
+	for key, value in pairs(preset) do
+		arg.Theme[key] = value
+	end
+	arg.CurrentTheme = name
+
+	-- Refresh every themed object only once.
+	for _, themed in ipairs(arg.ThemeItems) do
+		local item = themed.Item
+		if item and item.Parent ~= nil then
+			for property, source in pairs(themed.Properties) do
+				if type(source) == "string" then
+					local value = arg.Theme[source]
+					if value ~= nil then
+						pcall(function() item[property] = value end)
+					end
+				elseif type(source) == "function" then
+					local ok, value = pcall(source)
+					if ok and value ~= nil then
+						pcall(function() item[property] = value end)
+					end
+				end
+			end
+		end
+	end
+	return true
+end
+
 index3.Configure = function(arg, options)
 	options = options or {}
 	if options.Directory then
@@ -838,6 +981,9 @@ index3.Configure = function(arg, options)
 	end
 	if tonumber(options.FadeSpeed) then
 		arg.FadeSpeed = math.clamp(tonumber(options.FadeSpeed), 0, 2)
+	end
+	if options.Theme and arg.Themes[tostring(options.Theme)] then
+		arg:ApplyTheme(tostring(options.Theme))
 	end
 	return arg
 end
@@ -982,12 +1128,12 @@ index3.CreateColorpicker = function(arg, arg2)
 	local t19 = {
 		ColorpickerButton = index5:Create("TextButton", {
 			Parent = arg2.Parent.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(0, 0, 0), Text = "", AutoButtonColor = false,
-			AnchorPoint = Vector2.new(0, 0.5), BackgroundTransparency = 1, Size = UDim2.new(0, 100, 0, 20), ZIndex = 2, TextSize = 14,
+			AnchorPoint = Vector2.new(0, 0.5), BackgroundTransparency = 1, Size = UDim2.new(0, 100, 0, 20), ZIndex = 2, TextSize = 14, LayoutOrder = 10,
 		}),
 	}
 	local paletteHost = arg2.Parent2 or arg2.Parent
 	local paletteHostInstance = paletteHost and (paletteHost.Instance or paletteHost) or nil
-	if paletteHostInstance then
+	if paletteHostInstance and not arg2.Compact then
 		local existingPaletteIcon = paletteHostInstance:FindFirstChild("XDFLEXPaletteIcon")
 		if existingPaletteIcon then
 			t19.PaletteIcon = { Instance = existingPaletteIcon }
@@ -1016,6 +1162,17 @@ index3.CreateColorpicker = function(arg, arg2)
 		ZIndex = 2, TextSize = 14,
 	})
 	t19.Text:AddToTheme({ TextColor3 = "Text" })
+	if arg2.Compact then
+		t19.ColorpickerButton.Instance.Size = UDim2.new(0, 26, 0, 20)
+		t19.Color.Instance.Size = UDim2.new(0, 18, 0, 18)
+		t19.Color.Instance.Position = UDim2.new(0.5, 0, 0.5, 0)
+		t19.Color.Instance.AnchorPoint = Vector2.new(0.5, 0.5)
+		t19.Text.Instance.Visible = false
+		index5:Create("UIStroke", {
+			Parent = t19.Color.Instance, Color = Color3.fromRGB(255, 255, 255),
+			Transparency = 0.7, Thickness = 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		})
+	end
 	t19.ColorpickerWindow = index5:Create("TextButton", {
 		Parent = index3.UnusedHolder.Instance, AutoButtonColor = false, Text = "", Visible = false,
 		Position = UDim2.new(0.5, 0, 0.033642716705799103, 0), Size = UDim2.new(0, 235, 0, 270),
@@ -1654,7 +1811,7 @@ index3.Window = function(arg, arg2)
 	local items = {
 		MainFrame = index5:Create("Frame", {
 			Parent = index3.Holder.Instance, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 0.12,
-			Position = UDim2.new(0.55199998617172241, 0, 0.5, 0), Size = UDim2.new(0, 609, 0, 580), ZIndex = 2,
+			Position = UDim2.new(0.55199998617172241, 0, 0.5, 0), Size = UDim2.new(0, 680, 0, 590), ZIndex = 2,
 			BackgroundColor3 = Color3.fromRGB(27, 25, 29),
 		}),
 	}
@@ -2475,6 +2632,13 @@ index3.Window = function(arg, arg2)
 	end)
 	t21.Items = items2
 	setmetatable(t21, index3.Sections)
+	t21:Dropdown({
+		Name = "Theme preset", Flag = "ThemePreset", Default = index3.CurrentTheme,
+		Items = index3:GetThemeNames(), Searchable = false, Multi = false,
+		Callback = function(themeName)
+			index3:ApplyTheme(themeName)
+		end,
+	})
 	t21:Label("First gradient color"):Colorpicker({
 		Flag = "AccentColor", Default = index3.Theme.Accent,
 		Callback = function(accent)
@@ -3004,15 +3168,16 @@ index3.Pages.Section = function(arg, arg2)
 	end })
 	items.Description = index5:Create("TextLabel", {
 		Parent = items.TopBackground.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(183, 183, 183), Text = t19.Description,
-		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 15), BackgroundTransparency = 1, Position = UDim2.new(0, 50, 0, 28),
-		TextTransparency = 0.4, ZIndex = 2, TextSize = 15,
+		Size = UDim2.new(1, -102, 0, 15), BackgroundTransparency = 1, Position = UDim2.new(0, 50, 0, 29),
+		TextTransparency = 0.4, ZIndex = 2, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 	items.Description:AddToTheme({ TextColor3 = "Text" })
 	index5:Create("UICorner", { Parent = items.TopBackground.Instance, CornerRadius = UDim.new(0, 4) })
 	items.Title = index5:Create("TextLabel", {
 		Parent = items.TopBackground.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(248, 248, 248), Text = t19.Name,
-		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 15), BackgroundTransparency = 1, Position = UDim2.new(0, 50, 0, 10),
-		ZIndex = 2, TextSize = 15,
+		Size = UDim2.new(1, -102, 0, 17), BackgroundTransparency = 1, Position = UDim2.new(0, 50, 0, 9),
+		ZIndex = 2, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 	items.Title:AddToTheme({ TextColor3 = "Text" })
 	items.Toggle = index5:Create("TextButton", {
@@ -3230,7 +3395,7 @@ index3.CreateKeybind = function(arg, options)
 		BackgroundTransparency = 0.15,
 		BackgroundColor3 = index3.Theme.Outline,
 		Size = UDim2.new(0, 48, 0, 20),
-		ZIndex = 6,
+		ZIndex = 6, LayoutOrder = 20,
 		TextSize = 12,
 	})
 	button:AddToTheme({ TextColor3 = "Text", BackgroundColor3 = "Outline" })
@@ -3410,14 +3575,14 @@ index3.Sections.Toggle = function(arg, arg2)
 	end })
 	t20.Text = index5:Create("TextLabel", {
 		Parent = t20.Toggle.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextTransparency = 0.30000001192092896, Text = t19.Name, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 15),
-		Position = UDim2.new(0, 14, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5), BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 3, TextSize = 14,
+		TextTransparency = 0.30000001192092896, Text = t19.Name, Size = UDim2.new(1, -145, 1, 0),
+		Position = UDim2.new(0, 14, 0, 0), BackgroundTransparency = 1,
+		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 3, TextSize = 13,
 	})
 	t20.Text:AddToTheme({ TextColor3 = "Text" })
 	-- Right-side holder for nested Colorpicker / Keybind controls.
 	t20.SubElements = index5:Create("Frame", {
-		Parent = t20.Toggle.Instance, BackgroundTransparency = 1, Size = UDim2.new(0, 154, 0, 22),
+		Parent = t20.Toggle.Instance, BackgroundTransparency = 1, Size = UDim2.new(0, 104, 0, 22),
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -31, 0.5, 0), ZIndex = 5,
 	})
 	index5:Create("UIListLayout", {
@@ -3508,9 +3673,9 @@ index3.Sections.Toggle = function(arg, arg2)
 		items.Settings:AddToTheme({ BackgroundColor3 = "Background" })
 		index5:Create("UICorner", { Parent = items.Settings.Instance, CornerRadius = UDim.new(0, 6) })
 		items.SettingsIcon = index5:Create("ImageLabel", {
-			Parent = t20.Text.Instance, ImageColor3 = Color3.fromRGB(141, 141, 150), Size = UDim2.new(0, 14, 0, 14),
-			AnchorPoint = Vector2.new(0, 0.5), Image = "rbxassetid://101500482366184", BackgroundTransparency = 1,
-			Position = UDim2.new(1, 6, 0.5, 1), ZIndex = 3,
+			Parent = t20.SubElements.Instance, ImageColor3 = Color3.fromRGB(141, 141, 150), Size = UDim2.new(0, 16, 0, 16),
+			Image = "rbxassetid://101500482366184", BackgroundTransparency = 1, ZIndex = 6,
+			LayoutOrder = 30, Active = true,
 		})
 		t20.SettingsIcon = items.SettingsIcon
 		items.Content = index5:Create("ScrollingFrame", {
@@ -3654,7 +3819,7 @@ index3.Sections.Toggle = function(arg, arg2)
 		}
 		return (index3:CreateColorpicker({
 			Parent = t20.SubElements, Parent2 = t20.SubElements, Page = t22.Page, Section = t22.Section, Flag = t22.Flag, Default = t22.Default,
-			Callback = t22.Callback, Alpha = t22.Alpha,
+			Callback = t22.Callback, Alpha = t22.Alpha, Compact = true,
 		}))
 	end
 	t19.Keybind = function(arg3, arg4)
