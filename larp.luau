@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.0.0-stable",
+	Version = "1.1.0-stable",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -100,6 +100,24 @@ local function normalizeConfigName(name)
 		name ..= ".json"
 	end
 	return name
+end
+
+local function resolveImageSource(value)
+	if value == nil then
+		return ""
+	end
+	local source = tostring(value)
+	if source == "" then
+		return ""
+	end
+	-- Preserve complete Roblox image/content URIs such as rbxthumb:// and rbxassetid://.
+	if source:find("://", 1, true) then
+		return source
+	end
+	if source:match("^%d+$") then
+		return "rbxassetid://" .. source
+	end
+	return source
 end
 
 ensureFolder(index3.Folders.Directory)
@@ -847,7 +865,13 @@ index3.ChangeTheme = function(arg, arg2, arg3)
 end
 
 index3.IsMouseOverFrame = function(arg, arg2)
-	local instance = arg2.Instance
+	if not arg2 then
+		return false
+	end
+	local instance = arg2.Instance or arg2
+	if not instance or instance.Parent == nil then
+		return false
+	end
 	local v78 = Vector2.new(mouse.X, mouse.Y)
 	return v78.X >= instance.AbsolutePosition.X and v78.X <= instance.AbsolutePosition.X + instance.AbsoluteSize.X and v78.Y >= instance.AbsolutePosition.Y and v78.Y <= instance.AbsolutePosition.Y + instance.AbsoluteSize.Y
 end
@@ -961,18 +985,25 @@ index3.CreateColorpicker = function(arg, arg2)
 			AnchorPoint = Vector2.new(0, 0.5), BackgroundTransparency = 1, Size = UDim2.new(0, 100, 0, 20), ZIndex = 2, TextSize = 14,
 		}),
 	}
-	if not arg2.Parent2.Instance:FindFirstChild("nig") then
-		t19.PaletteIcon = index5:Create("ImageLabel", {
-			Parent = arg2.Parent2.Instance, ImageColor3 = Color3.fromRGB(141, 141, 150), Size = UDim2.new(0, 16, 0, 16),
-			AnchorPoint = Vector2.new(0.5, 1), Image = "rbxassetid://92464809279921", Name = "nig", BackgroundTransparency = 1,
-			Position = UDim2.new(1, -16, 1, -6), ZIndex = 2,
-		})
-		t19.PaletteIcon:OnHover(function()
-			t19.PaletteIcon:Tween(nil, { ImageColor3 = index3.Theme.Accent })
-		end)
-		t19.PaletteIcon:OnHoverLeave(function()
-			t19.PaletteIcon:Tween(nil, { ImageColor3 = Color3.fromRGB(141, 141, 150) })
-		end)
+	local paletteHost = arg2.Parent2 or arg2.Parent
+	local paletteHostInstance = paletteHost and (paletteHost.Instance or paletteHost) or nil
+	if paletteHostInstance then
+		local existingPaletteIcon = paletteHostInstance:FindFirstChild("XDFLEXPaletteIcon")
+		if existingPaletteIcon then
+			t19.PaletteIcon = { Instance = existingPaletteIcon }
+		else
+			t19.PaletteIcon = index5:Create("ImageLabel", {
+				Parent = paletteHostInstance, ImageColor3 = Color3.fromRGB(141, 141, 150), Size = UDim2.new(0, 16, 0, 16),
+				AnchorPoint = Vector2.new(0.5, 1), Image = "rbxassetid://92464809279921", Name = "XDFLEXPaletteIcon", BackgroundTransparency = 1,
+				Position = UDim2.new(1, -16, 1, -6), ZIndex = 2,
+			})
+			t19.PaletteIcon:OnHover(function()
+				t19.PaletteIcon:Tween(nil, { ImageColor3 = index3.Theme.Accent })
+			end)
+			t19.PaletteIcon:OnHoverLeave(function()
+				t19.PaletteIcon:Tween(nil, { ImageColor3 = Color3.fromRGB(141, 141, 150) })
+			end)
+		end
 	end
 	t19.Color = index5:Create("Frame", {
 		Parent = t19.ColorpickerButton.Instance, Size = UDim2.new(0, 15, 0, 15), Position = UDim2.new(0, 0, 0, 2), ZIndex = 2,
@@ -1219,17 +1250,23 @@ index3.CreateColorpicker = function(arg, arg2)
 				end
 			end
 		end
-		v89.Tween.Completed:Connect(function()
+		local function finishColorpickerTransition()
 			b18 = false
 			t19.ColorpickerWindow.Instance.Visible = t18.IsOpen
 			task.wait(0.2)
 			t19.ColorpickerWindow.Instance.Parent = not t18.IsOpen and index3.UnusedHolder.Instance or index3.Holder.Instance
-		end)
+		end
+		if v89 and v89.Tween then
+			v89.Tween.Completed:Connect(finishColorpickerTransition)
+		else
+			task.defer(finishColorpickerTransition)
+		end
 	end
 	t18.Set = function(arg3, arg4, alpha)
 		if type(arg4) == "table" then
-			arg4 = Color3.fromRGB(arg4[1], arg4[2], arg4[3])
-			alpha = arg4[4]
+			local packedColor = arg4
+			alpha = alpha ~= nil and alpha or packedColor[4]
+			arg4 = Color3.fromRGB(packedColor[1] or 255, packedColor[2] or 255, packedColor[3] or 255)
 		elseif type(arg4) == "string" then
 			arg4 = Color3.fromHex(arg4)
 		end
@@ -1301,7 +1338,7 @@ index3.CreateColorpicker = function(arg, arg2)
 			end)
 		end
 	end)
-	AddColor = function(arg3)
+	local function AddColor(arg3)
 		local n = #t18.SavedColors + 1
 		local tween = index5:Create("TextButton", {
 			Parent = t19.SavedColors.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(0, 0, 0), Text = "",
@@ -1370,7 +1407,7 @@ index3.CreateColorpicker = function(arg, arg2)
 			if not t18.IsOpen then
 				return
 			end
-			if index3:IsMouseOverFrame(t19.ColorpickerWindow) or index3:IsMouseOverFrame(t19.PaletteIcon) and not arg2.Section.IsSettings then
+			if index3:IsMouseOverFrame(t19.ColorpickerWindow) or (t19.PaletteIcon and index3:IsMouseOverFrame(t19.PaletteIcon) and not arg2.Section.IsSettings) then
 				return
 			end
 			t18:SetOpen(false)
@@ -1531,7 +1568,7 @@ index3.Notification = function(arg, arg2)
 	end })
 	t18.Icon = index5:Create("ImageLabel", {
 		Parent = t18.Notification.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(1, 0),
-		Image = "rbxassetid://" .. arg2.Icon, BackgroundTransparency = 1, Position = UDim2.new(1, 0, 0, 0), Size = UDim2.new(0, 16, 0, 16),
+		Image = resolveImageSource(arg2.Icon), BackgroundTransparency = 1, Position = UDim2.new(1, 0, 0, 0), Size = UDim2.new(0, 16, 0, 16),
 	})
 	if not arg2.IconColor then
 		index5:Create("UIGradient", {
@@ -1609,7 +1646,7 @@ index3.Window = function(arg, arg2)
 	local t19 = {
 		Name = t18.Name or t18.name or "Window",
 		SubName = t18.SubName or t18.subname or "Fine-tuning for sure wins",
-		Logo = tostring(t18.Logo or t18.logo or "79389153354922"),
+		Logo = resolveImageSource(t18.Logo or t18.logo or "79389153354922"),
 		MenuKeybind = resolveMenuKeybind(t18.Keybind or t18.keybind or t18.MenuKeybind or t18.menukeybind or index3.MenuKeybind),
 		ShowToggle = t18.ShowToggle ~= false,
 		Pages = {}, Items = {}, IsOpen = false, CurrentAlignment = "LeftTabs",
@@ -1714,8 +1751,7 @@ index3.Window = function(arg, arg2)
 	end
 	items.ResizeBR = f27(Vector2.new(1, 1), UDim2.new(1, -6, 1, -6), 1)
 	items.ResizeTL = f27(Vector2.new(0, 0), UDim2.new(0, 6, 0, 6), -1)
-	local v78 = OriginalSizes
-	items.MainFrame:MakeResizeable(Vector2.new(items.MainFrame.Instance.AbsoluteSize.X, items.MainFrame.Instance.AbsoluteSize.Y), Vector2.new(9999, 9999), v78)
+	items.MainFrame:MakeResizeable(Vector2.new(items.MainFrame.Instance.AbsoluteSize.X, items.MainFrame.Instance.AbsoluteSize.Y), Vector2.new(9999, 9999), nil)
 	index3:MakeBlurred(items.MainFrame, t19)
 	items.LeftTabs = index5:Create("Frame", {
 		Parent = items.MainFrame.Instance, Visible = true, AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.15,
@@ -1808,7 +1844,7 @@ index3.Window = function(arg, arg2)
 		end
 	end)
 	items.FloatingLogo = index5:Create("ImageLabel", {
-		Parent = items.FloatingButton.Instance, Image = "rbxassetid://" .. t19.Logo, BackgroundTransparency = 1,
+		Parent = items.FloatingButton.Instance, Image = t19.Logo, BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), ZIndex = 127, Size = UDim2.new(1, -27, 1, -25),
 	})
 	index5:Create("UICorner", { Parent = items.FloatingButton.Instance, CornerRadius = UDim.new(1, 0), Name = "UICorner" })
@@ -1832,7 +1868,7 @@ index3.Window = function(arg, arg2)
 	})
 	items.Logo = index5:Create("ImageLabel", {
 		Parent = items.MainFrame.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), ScaleType = Enum.ScaleType.Fit,
-		Size = UDim2.new(0, 35, 0, 35), Image = "rbxassetid://" .. t19.Logo, BackgroundTransparency = 1, Position = UDim2.new(0, 12, 0, 12),
+		Size = UDim2.new(0, 35, 0, 35), Image = t19.Logo, BackgroundTransparency = 1, Position = UDim2.new(0, 12, 0, 12),
 		ZIndex = 2,
 	})
 	index5:Create("UIGradient", {
@@ -2111,7 +2147,7 @@ index3.Window = function(arg, arg2)
 		index5:Create("UICorner", { Parent = tween2.Instance, CornerRadius = UDim.new(0, 6) })
 		local tween3 = index5:Create("ImageLabel", {
 			Parent = tween2.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, 16, 0, 16),
-			AnchorPoint = Vector2.new(0.5, 0.5), Image = "rbxassetid://" .. (arg4.Icon or "123944728972740"), BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5), Image = resolveImageSource(arg4.Icon or "123944728972740"), BackgroundTransparency = 1,
 			Position = UDim2.new(0.5, 0, 0.5, 0), ZIndex = 55,
 		})
 		index5:Create("UIGradient", { Parent = tween3.Instance }):AddToTheme({ Color = function()
@@ -2598,7 +2634,7 @@ index3.Page = function(arg, arg2)
 	items.Gradient = create(v78, v79, t20)
 	items.Icon = index5:Create("ImageLabel", {
 		Parent = items.Inactive.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, 18, 0, 18),
-		AnchorPoint = Vector2.new(0, 0.5), Image = "rbxassetid://" .. t19.Icon, BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0, 0.5), Image = resolveImageSource(t19.Icon), BackgroundTransparency = 1,
 		Position = UDim2.new(0, 16, 0.5, 0), ZIndex = 2,
 	})
 	index5:Create("UIGradient", { Parent = items.Icon.Instance, Rotation = -115 }):AddToTheme({ Color = function()
@@ -2949,7 +2985,7 @@ index3.Pages.Section = function(arg, arg2)
 	items.TopBackground:AddToTheme({ BackgroundColor3 = "Section Top" })
 	items.Icon = index5:Create("ImageLabel", {
 		Parent = items.TopBackground.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, 21, 0, 24),
-		AnchorPoint = Vector2.new(0, 0.5), Image = "rbxassetid://" .. t19.Icon, BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0, 0.5), Image = resolveImageSource(t19.Icon), BackgroundTransparency = 1,
 		Position = UDim2.new(0, 15, 0.5, 0), ZIndex = 2,
 	})
 	index5:Create("UIGradient", {
@@ -3416,7 +3452,7 @@ index3.Sections.Toggle = function(arg, arg2)
 			Alpha = t21.Alpha or t21.alpha or false,
 		}
 		return (index3:CreateColorpicker({
-			Parent = t20.SubElements, Page = t22.Page, Section = t22.Section, Flag = t22.Flag, Default = t22.Default,
+			Parent = t20.SubElements, Parent2 = t20.Toggle, Page = t22.Page, Section = t22.Section, Flag = t22.Flag, Default = t22.Default,
 			Callback = t22.Callback, Alpha = t22.Alpha,
 		}))
 	end
@@ -3500,7 +3536,7 @@ index3.Sections.Button = function(arg, arg2)
 	if t19.Icon then
 		t20.Icon = index5:Create("ImageLabel", {
 			Parent = t20.Text.Instance, ImageColor3 = Color3.fromRGB(240, 240, 240), ImageTransparency = 0.30000001192092896,
-			Size = UDim2.new(0, 18, 0, 18), AnchorPoint = Vector2.new(1, 0.5), Image = "rbxassetid://" .. t19.Icon,
+			Size = UDim2.new(0, 18, 0, 18), AnchorPoint = Vector2.new(1, 0.5), Image = resolveImageSource(t19.Icon),
 			BackgroundTransparency = 1, Position = UDim2.new(0, -8, 0.5, 0), ZIndex = 3,
 		})
 		t20.Icon:AddToTheme({ ImageColor3 = "Text" })
@@ -3701,6 +3737,7 @@ end
 
 index3.Sections.Dropdown = function(arg, arg2)
 	local t18 = arg2 or {}
+	local Debounce = false
 	local t19 = { Window = arg.Window, Page = arg.Page, Section = arg, Name = t18.Name or t18.name or "Dropdown" }
 	t19.Flag = t18.Flag or t18.flag or index3:NextFlag()
 	t19.Items = t18.Items or t18.items or { "One", "Two", "Three" }
@@ -4915,6 +4952,7 @@ end
 
 index3.Sections.DropdownEx = function(arg, arg2)
 	local t18 = arg2 or {}
+	local Debounce = false
 	local t19 = { Window = arg.Window, Page = arg.Page, Section = arg, Name = t18.Name or t18.name or "Dropdown" }
 	t19.Flag = t18.Flag or t18.flag or index3:NextFlag()
 	t19.Items = t18.Items or t18.items or {}
@@ -5220,7 +5258,7 @@ index3.Sections.DropdownEx = function(arg, arg2)
 		index5:Create("UICorner", { Parent = tween3.Instance, CornerRadius = UDim.new(0, 4) })
 		local tween4 = index5:Create("ImageLabel", {
 			Parent = tween3.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(1, -6, 1, -6),
-			AnchorPoint = Vector2.new(0.5, 0.5), Image = "rbxassetid://" .. (icon or t19.DefaultIcon), BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5), Image = resolveImageSource(icon or t19.DefaultIcon), BackgroundTransparency = 1,
 			Position = UDim2.new(0.5, 0, 0.5, 0), ZIndex = 5, ScaleType = Enum.ScaleType.Fit,
 		})
 		local tween5 = index5:Create("Frame", {
@@ -7290,4 +7328,6 @@ index3.CreateSettingsPage = function(arg, arg2)
 end
 
 -- Library module: intentionally no demo UI / auto window side effects.
+index3.ResolveImageSource = resolveImageSource
+
 return index3
