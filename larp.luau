@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.3.0-stable",
+	Version = "1.3.1-stable",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -3575,8 +3575,8 @@ index3.Sections.Toggle = function(arg, arg2)
 	end })
 	t20.Text = index5:Create("TextLabel", {
 		Parent = t20.Toggle.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextTransparency = 0.30000001192092896, Text = t19.Name, Size = UDim2.new(1, -145, 1, 0),
-		Position = UDim2.new(0, 14, 0, 0), BackgroundTransparency = 1,
+		TextTransparency = 0.30000001192092896, Text = t19.Name, Size = UDim2.new(1, -55, 0, 16),
+		AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 14, 0.5, 0), BackgroundTransparency = 1,
 		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 3, TextSize = 13,
 	})
 	t20.Text:AddToTheme({ TextColor3 = "Text" })
@@ -3590,6 +3590,10 @@ index3.Sections.Toggle = function(arg, arg2)
 		HorizontalAlignment = Enum.HorizontalAlignment.Right, VerticalAlignment = Enum.VerticalAlignment.Center,
 		Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder,
 	})
+	local function reserveToggleExtras()
+		-- Only sacrifice title width when the toggle actually has nested controls.
+		t20.Text.Instance.Size = UDim2.new(1, -145, 0, 16)
+	end
 	t20.Indicator = index5:Create("Frame", {
 		Parent = t20.Toggle.Instance, Size = UDim2.new(0, 18, 0, 18), AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -8, 0.5, 0), ZIndex = 3, BackgroundColor3 = Color3.fromRGB(38, 36, 42),
@@ -3662,6 +3666,7 @@ index3.Sections.Toggle = function(arg, arg2)
 	end
 	local items = {}
 	t19.Settings = function(arg3, arg4)
+		reserveToggleExtras()
 		local settings_ = { IsOpen = false, Name = "", Items = {}, IsSettings = true, Elements = {} }
 		t19.Settings = settings_
 		items = {}
@@ -3810,6 +3815,7 @@ index3.Sections.Toggle = function(arg, arg2)
 		return settings_
 	end
 	t19.Colorpicker = function(arg3, arg4)
+		reserveToggleExtras()
 		local t21 = arg4 or {}
 		local t22 = {
 			Window = t19.Window, Page = t19.Page, Section = t19.Section, Flag = t21.Flag or t21.flag or index3:NextFlag(),
@@ -3823,6 +3829,7 @@ index3.Sections.Toggle = function(arg, arg2)
 		}))
 	end
 	t19.Keybind = function(arg3, arg4)
+		reserveToggleExtras()
 		local t21 = arg4 or {}
 		local t22 = {
 			Window = t19.Window, Page = t19.Page, Section = t19.Section, Flag = t21.Flag or t21.flag or index3:NextFlag(),
@@ -3976,8 +3983,9 @@ index3.Sections.Slider = function(arg, arg2)
 	end })
 	t20.Text = index5:Create("TextLabel", {
 		Parent = t20.Slider.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(240, 240, 240), TextTransparency = 0.15,
-		Text = t19.Name, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 15), BackgroundTransparency = 1,
-		Position = UDim2.new(0, 14, 0, 8), ZIndex = 3, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left,
+		Text = t19.Name, Size = UDim2.new(1, -125, 0, 16), BackgroundTransparency = 1,
+		Position = UDim2.new(0, 14, 0, 7), ZIndex = 3, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 	t20.Text:AddToTheme({ TextColor3 = "Text" })
 	t20.Value = index5:Create("TextLabel", {
@@ -4137,8 +4145,9 @@ index3.Sections.Dropdown = function(arg, arg2)
 	end })
 	t20.Text = index5:Create("TextLabel", {
 		Parent = t20.Dropdown.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextTransparency = 0.30000001192092896, Text = t19.Name, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 15),
-		AnchorPoint = Vector2.new(0, 0.5), BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0.5, 0), ZIndex = 6, TextSize = 14,
+		TextTransparency = 0.30000001192092896, Text = t19.Name, Size = UDim2.new(1, -(t19.Size + 34), 0, 16),
+		AnchorPoint = Vector2.new(0, 0.5), BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0.5, 0), ZIndex = 6,
+		TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 	t20.Text:AddToTheme({ TextColor3 = "Text" })
 	t20.RealDropdown = index5:Create("TextButton", {
@@ -4651,8 +4660,9 @@ index3.Sections.Keybind = function(arg, arg2)
 	end })
 	t20.Text = index5:Create("TextLabel", {
 		Parent = t20.Label.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextTransparency = 0.30000001192092896, Text = t19.Name, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 15),
-		BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0, 8), ZIndex = 3, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left,
+		TextTransparency = 0.30000001192092896, Text = t19.Name, Size = UDim2.new(1, -130, 0, 16),
+		BackgroundTransparency = 1, Position = UDim2.new(0, 14, 0, 7), ZIndex = 3, TextSize = 13,
+		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 	t20.Text:AddToTheme({ TextColor3 = "Text" })
 	t20.SubElements = index5:Create("Frame", {
@@ -4999,7 +5009,8 @@ index3.Sections.Textbox = function(arg, arg2)
 		Parent = t20.Textbox.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(240, 240, 240), Text = "", ZIndex = 3,
 		Size = UDim2.new(1, -24, 1, 0), Position = UDim2.new(0, 14, 0, 0), BackgroundTransparency = 1,
 		ClearTextOnFocus = t19.ClearTextOnFocus, PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
-		TextXAlignment = Enum.TextXAlignment.Left, PlaceholderText = t19.Placeholder, TextSize = 14,
+		TextXAlignment = Enum.TextXAlignment.Left, PlaceholderText = t19.Placeholder, TextSize = 13,
+		TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 	t20.Input:AddToTheme({ TextColor3 = "Text" })
 	t19.Get = function()
