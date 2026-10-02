@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.1.0-stable",
+	Version = "1.2.0-stable",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -1806,8 +1806,8 @@ index3.Window = function(arg, arg2)
 	end)
 	items.FloatingButton = index5:Create("TextButton", {
 		Parent = index3.Holder.Instance, Text = "", AutoButtonColor = false, Position = UDim2.new(0.5, 0, 0, 20),
-		AnchorPoint = Vector2.new(0.5, 0), Visible = true, Size = UDim2.new(0, 50, 0, 50), BackgroundTransparency = 0.5, ZIndex = 127,
-		BackgroundColor3 = index3.Theme.Background,
+		AnchorPoint = Vector2.new(0.5, 0), Visible = true, Size = UDim2.new(0, 54, 0, 54), BackgroundTransparency = 1, ZIndex = 127,
+		BackgroundColor3 = index3.Theme.Background, ClipsDescendants = true,
 	})
 	items.FloatingButton:AddToTheme({ BackgroundColor3 = "Background" })
 	items.FloatingButton.Instance.Visible = t19.ShowToggle
@@ -1845,9 +1845,15 @@ index3.Window = function(arg, arg2)
 	end)
 	items.FloatingLogo = index5:Create("ImageLabel", {
 		Parent = items.FloatingButton.Instance, Image = t19.Logo, BackgroundTransparency = 1,
-		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), ZIndex = 127, Size = UDim2.new(1, -27, 1, -25),
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), ZIndex = 128,
+		Size = UDim2.new(1, 0, 1, 0), ScaleType = Enum.ScaleType.Crop,
 	})
 	index5:Create("UICorner", { Parent = items.FloatingButton.Instance, CornerRadius = UDim.new(1, 0), Name = "UICorner" })
+	index5:Create("UICorner", { Parent = items.FloatingLogo.Instance, CornerRadius = UDim.new(1, 0), Name = "LogoCorner" })
+	local floatingStroke = index5:Create("UIStroke", {
+		Parent = items.FloatingButton.Instance, Thickness = 2, Transparency = 0.12, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	floatingStroke:AddToTheme({ Color = "Accent" })
 	index5:Create("UIGradient", {
 		Parent = items.FloatingLogo.Instance, Enabled = true, Rotation = -115,
 		Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(143, 143, 143)) }),
@@ -1867,10 +1873,11 @@ index3.Window = function(arg, arg2)
 		PaddingLeft = UDim.new(0, 12),
 	})
 	items.Logo = index5:Create("ImageLabel", {
-		Parent = items.MainFrame.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), ScaleType = Enum.ScaleType.Fit,
-		Size = UDim2.new(0, 35, 0, 35), Image = t19.Logo, BackgroundTransparency = 1, Position = UDim2.new(0, 12, 0, 12),
+		Parent = items.MainFrame.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), ScaleType = Enum.ScaleType.Crop,
+		Size = UDim2.new(0, 38, 0, 38), Image = t19.Logo, BackgroundTransparency = 1, Position = UDim2.new(0, 10, 0, 9),
 		ZIndex = 2,
 	})
+	index5:Create("UICorner", { Parent = items.Logo.Instance, CornerRadius = UDim.new(1, 0), Name = "LogoCorner" })
 	index5:Create("UIGradient", {
 		Parent = items.Logo.Instance, Enabled = true, Rotation = -115,
 		Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(143, 143, 143)) }),
@@ -3188,6 +3195,190 @@ index3.Pages.Section = function(arg, arg2)
 	return setmetatable(t19, index3.Sections)
 end
 
+
+-- Compact keybind used by Toggle:Keybind.
+-- The leaked source referenced index3:CreateKeybind() but never defined it.
+index3.CreateKeybind = function(arg, options)
+	options = options or {}
+	local parentObject = options.Parent
+	local parent = parentObject and (parentObject.Instance or parentObject) or nil
+	if not parent then
+		error("XDFLEX UI: CreateKeybind requires Parent", 2)
+	end
+
+	local state = {
+		Flag = options.Flag or index3:NextFlag(),
+		Key = nil,
+		Value = "None",
+		Mode = tostring(options.Mode or "Toggle"),
+		Toggled = false,
+		Picking = false,
+		Callback = options.Callback or function() end,
+	}
+
+	if not table.find({ "Toggle", "Hold", "Always" }, state.Mode) then
+		state.Mode = "Toggle"
+	end
+
+	local button = index5:Create("TextButton", {
+		Parent = parent,
+		FontFace = index3.Font,
+		TextColor3 = index3.Theme.Text,
+		TextTransparency = 0.15,
+		Text = "None",
+		AutoButtonColor = false,
+		BackgroundTransparency = 0.15,
+		BackgroundColor3 = index3.Theme.Outline,
+		Size = UDim2.new(0, 48, 0, 20),
+		ZIndex = 6,
+		TextSize = 12,
+	})
+	button:AddToTheme({ TextColor3 = "Text", BackgroundColor3 = "Outline" })
+	index5:Create("UICorner", { Parent = button.Instance, CornerRadius = UDim.new(0, 4) })
+
+	local function keyText(key)
+		if typeof(key) ~= "EnumItem" then
+			return "None"
+		end
+		if key == Enum.KeyCode.Backspace or key == Enum.KeyCode.Unknown then
+			return "None"
+		end
+		return keyNames[tostring(key)] or key.Name or tostring(key):gsub("Enum%.KeyCode%.", ""):gsub("Enum%.UserInputType%.", "")
+	end
+
+	local function saveFlag()
+		index3.Flags[state.Flag] = {
+			Key = state.Key and tostring(state.Key) or "None",
+			Mode = state.Mode,
+			Toggled = state.Toggled,
+		}
+	end
+
+	local function emit(value)
+		state.Toggled = value and true or false
+		saveFlag()
+		index3:SafeCall(state.Callback, state.Toggled)
+	end
+
+	local function matches(input)
+		if not state.Key then
+			return false
+		end
+		return input.KeyCode == state.Key or input.UserInputType == state.Key
+	end
+
+	function state:Set(value, silent)
+		if typeof(value) == "EnumItem" then
+			state.Key = value == Enum.KeyCode.Backspace and nil or value
+		elseif type(value) == "table" then
+			if value.Mode and table.find({ "Toggle", "Hold", "Always" }, tostring(value.Mode)) then
+				state.Mode = tostring(value.Mode)
+			end
+			if value.Toggled ~= nil then
+				state.Toggled = value.Toggled and true or false
+			end
+			local rawKey = value.Key
+			if typeof(rawKey) == "EnumItem" then
+				state.Key = rawKey
+			elseif type(rawKey) == "string" and rawKey ~= "None" then
+				local enumName = rawKey:gsub("Enum%.KeyCode%.", ""):gsub("Enum%.UserInputType%.", "")
+				local okKey, enumKey = pcall(function() return Enum.KeyCode[enumName] end)
+				if okKey and enumKey then
+					state.Key = enumKey
+				else
+					local okInput, enumInput = pcall(function() return Enum.UserInputType[enumName] end)
+					state.Key = okInput and enumInput or nil
+				end
+			else
+				state.Key = nil
+			end
+		elseif type(value) == "string" and table.find({ "Toggle", "Hold", "Always" }, value) then
+			state.Mode = value
+		elseif value == nil then
+			state.Key = nil
+		end
+
+		state.Value = keyText(state.Key)
+		button.Instance.Text = state.Value
+		state.Picking = false
+		saveFlag()
+		if not silent and state.Mode == "Always" then
+			emit(true)
+		end
+	end
+
+	function state:Get()
+		return state.Key, state.Mode, state.Toggled
+	end
+
+	function state:SetMode(mode)
+		mode = tostring(mode or "Toggle")
+		if table.find({ "Toggle", "Hold", "Always" }, mode) then
+			state.Mode = mode
+			if mode == "Always" then
+				emit(true)
+			else
+				saveFlag()
+			end
+		end
+	end
+
+	button:Connect("Activated", function()
+		if state.Picking then
+			return
+		end
+		state.Picking = true
+		button.Instance.Text = "..."
+		local pickConnection
+		pickConnection = UserInputService.InputBegan:Connect(function(input)
+			if input.UserInputType ~= Enum.UserInputType.Keyboard
+				and input.UserInputType ~= Enum.UserInputType.MouseButton1
+				and input.UserInputType ~= Enum.UserInputType.MouseButton2
+				and input.UserInputType ~= Enum.UserInputType.MouseButton3 then
+				return
+			end
+			if pickConnection then
+				pickConnection:Disconnect()
+				pickConnection = nil
+			end
+			if input.KeyCode == Enum.KeyCode.Backspace or input.KeyCode == Enum.KeyCode.Escape then
+				state:Set(nil, true)
+			elseif input.UserInputType == Enum.UserInputType.Keyboard then
+				state:Set(input.KeyCode, true)
+			else
+				state:Set(input.UserInputType, true)
+			end
+		end)
+	end)
+
+	index3:Connect(UserInputService.InputBegan, function(input)
+		if state.Picking or UserInputService:GetFocusedTextBox() or not matches(input) then
+			return
+		end
+		if state.Mode == "Toggle" then
+			emit(not state.Toggled)
+		elseif state.Mode == "Hold" then
+			emit(true)
+		elseif state.Mode == "Always" then
+			emit(true)
+		end
+	end)
+
+	index3:Connect(UserInputService.InputEnded, function(input)
+		if state.Picking or not matches(input) then
+			return
+		end
+		if state.Mode == "Hold" then
+			emit(false)
+		end
+	end)
+
+	state:SetMode(state.Mode)
+	state:Set(options.Default or Enum.KeyCode.E, true)
+	return state
+end
+
+
 index3.Sections.Toggle = function(arg, arg2)
 	local t18 = arg2 or {}
 	local t19 = { Window = arg.Window, Page = arg.Page, Section = arg, Name = t18.Name or t18.name or "Toggle" }
@@ -3224,6 +3415,16 @@ index3.Sections.Toggle = function(arg, arg2)
 		TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 3, TextSize = 14,
 	})
 	t20.Text:AddToTheme({ TextColor3 = "Text" })
+	-- Right-side holder for nested Colorpicker / Keybind controls.
+	t20.SubElements = index5:Create("Frame", {
+		Parent = t20.Toggle.Instance, BackgroundTransparency = 1, Size = UDim2.new(0, 154, 0, 22),
+		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -31, 0.5, 0), ZIndex = 5,
+	})
+	index5:Create("UIListLayout", {
+		Parent = t20.SubElements.Instance, FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Right, VerticalAlignment = Enum.VerticalAlignment.Center,
+		Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder,
+	})
 	t20.Indicator = index5:Create("Frame", {
 		Parent = t20.Toggle.Instance, Size = UDim2.new(0, 18, 0, 18), AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -8, 0.5, 0), ZIndex = 3, BackgroundColor3 = Color3.fromRGB(38, 36, 42),
@@ -3452,7 +3653,7 @@ index3.Sections.Toggle = function(arg, arg2)
 			Alpha = t21.Alpha or t21.alpha or false,
 		}
 		return (index3:CreateColorpicker({
-			Parent = t20.SubElements, Parent2 = t20.Toggle, Page = t22.Page, Section = t22.Section, Flag = t22.Flag, Default = t22.Default,
+			Parent = t20.SubElements, Parent2 = t20.SubElements, Page = t22.Page, Section = t22.Section, Flag = t22.Flag, Default = t22.Default,
 			Callback = t22.Callback, Alpha = t22.Alpha,
 		}))
 	end
