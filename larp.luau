@@ -218,7 +218,17 @@ local index4 = {}
 index4.__index = index4
 
 index4.Create = function(arg, arg2, arg3, arg4, arg5)
-	local instance = arg5 and arg2 or arg2.Instance
+	if not arg2 then
+		local dummy = { Play = function() end, Cancel = function() end, Pause = function() end, Tween = { Play = function() end, Cancel = function() end, Pause = function() end } }
+		setmetatable(dummy, index4)
+		return dummy
+	end
+	local instance = arg5 and arg2 or (typeof(arg2) == "table" and arg2.Instance or arg2)
+	if not instance then
+		local dummy = { Play = function() end, Cancel = function() end, Pause = function() end, Tween = { Play = function() end, Cancel = function() end, Pause = function() end } }
+		setmetatable(dummy, index4)
+		return dummy
+	end
 	arg3 = arg3 or TweenInfo.new(index3.Tween.Time, index3.Tween.Style, index3.Tween.Direction)
 	local t18 = { Tween = TweenService:Create(instance, arg3, arg4), Info = arg3, Goal = arg4, Item = instance }
 	t18.Tween:Play()
@@ -1910,11 +1920,14 @@ index3.Window = function(arg, arg2)
 	items.ResizeTL = f27(Vector2.new(0, 0), UDim2.new(0, 6, 0, 6), -1)
 	items.MainFrame:MakeResizeable(Vector2.new(items.MainFrame.Instance.AbsoluteSize.X, items.MainFrame.Instance.AbsoluteSize.Y), Vector2.new(9999, 9999), nil)
 	index3:MakeBlurred(items.MainFrame, t19)
-	items.LeftTabs = index5:Create("Frame", {
+	items.LeftTabs = index5:Create("ScrollingFrame", {
 		Parent = items.MainFrame.Instance, Visible = true, AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.15,
 		Size = UDim2.new(0, 203, 1, 0), ZIndex = 2, BackgroundColor3 = Color3.fromRGB(27, 25, 29),
+		Active = true, ScrollBarThickness = 2, AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = UDim2.new(0, 0, 0, 0), ElasticBehavior = Enum.ElasticBehavior.WhenScrollable,
+		ScrollBarImageTransparency = 0.4, BorderSizePixel = 0,
 	})
-	items.LeftTabs:AddToTheme({ BackgroundColor3 = "Background" })
+	items.LeftTabs:AddToTheme({ BackgroundColor3 = "Background", ScrollBarImageColor3 = "Accent" })
 	index3:MakeBlurred(items.LeftTabs, t19)
 	local instance = items.MainFrame.Instance
 	local b15 = false
@@ -1932,18 +1945,6 @@ index3.Window = function(arg, arg2)
 			if items.ResizeTL and index3:IsMouseOverFrame(items.ResizeTL) then
 				return
 			end
-			b15 = true
-			position = arg3.Position
-			position2 = instance.Position
-			arg3.Changed:Connect(function()
-				if arg3.UserInputState == Enum.UserInputState.End then
-					b15 = false
-				end
-			end)
-		end
-	end)
-	items.LeftTabs:Connect("InputBegan", function(arg3)
-		if arg3.UserInputType == Enum.UserInputType.MouseButton1 or arg3.UserInputType == Enum.UserInputType.Touch then
 			b15 = true
 			position = arg3.Position
 			position2 = instance.Position
@@ -2023,11 +2024,11 @@ index3.Window = function(arg, arg2)
 		Size = UDim2.new(0, 0, 0, 0), ZIndex = 2,
 	})
 	index5:Create("UIListLayout", {
-		Parent = items.LeftTabs.Instance, Padding = UDim.new(0, 12), SortOrder = Enum.SortOrder.LayoutOrder,
+		Parent = items.LeftTabs.Instance, Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder,
 	})
 	index5:Create("UIPadding", {
-		Parent = items.LeftTabs.Instance, PaddingTop = UDim.new(0, 15), PaddingBottom = UDim.new(0, 15), PaddingRight = UDim.new(0, 12),
-		PaddingLeft = UDim.new(0, 12),
+		Parent = items.LeftTabs.Instance, PaddingTop = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10), PaddingRight = UDim.new(0, 8),
+		PaddingLeft = UDim.new(0, 10),
 	})
 	items.Logo = index5:Create("ImageLabel", {
 		Parent = items.MainFrame.Instance, ImageColor3 = Color3.fromRGB(255, 255, 255), ScaleType = Enum.ScaleType.Crop,
@@ -2782,7 +2783,7 @@ index3.Page = function(arg, arg2)
 	local items = {
 		Inactive = index5:Create("TextButton", {
 			Parent = t19.Window.Items.LeftTabs.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(0, 0, 0), Text = "",
-			AutoButtonColor = false, BackgroundTransparency = 1, Size = UDim2.new(0, 200, 0, 40), ZIndex = 2, TextSize = 14,
+			AutoButtonColor = false, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 34), ZIndex = 2, TextSize = 14,
 			BackgroundColor3 = Color3.fromRGB(124, 77, 255),
 		}),
 	}
@@ -3012,7 +3013,7 @@ index3.Pages.GlobalChat = function(arg, arg2)
 	})
 	globalChatt.SetVisibility = function(arg3, visible)
 		t18.GlobalChat.Instance.Visible = visible
-		t18.GlobalChat.Instance.Parent = visible and Data.MainFrame.Instance or index3.UnusedHolder
+		t18.GlobalChat.Instance.Parent = visible and Data.MainFrame.Instance or index3.UnusedHolder.Instance
 	end
 	globalChatt.SetStatus = function(arg3, text, textColor3)
 		t18.StatusText.Instance.Text = text
@@ -4582,13 +4583,19 @@ index3.Sections.Label = function(arg, arg2)
 			t19.Text:Tween(TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Position = UDim2.new(0, 0, 0, 0) })
 			if t19.SubElements then
 				t19.SubElements:Tween(TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Position = UDim2.new(0, 0, 0, 30) })
-				index4:Create(t19.Label.Instance:FindFirstChild("nig"), TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Position = UDim2.new(1, -16, 1, -6) }, true)
+				local targetChild = t19.Label.Instance:FindFirstChild("Indicator") or t19.Label.Instance:FindFirstChild("Icon")
+				if targetChild then
+					index4:Create(targetChild, TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Position = UDim2.new(1, -16, 1, -6) }, true)
+				end
 			end
 		else
 			t19.Text.Instance.Position = UDim2.new(0, 26, 0, 0)
 			if t19.SubElements then
 				t19.SubElements:Tween(TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Position = UDim2.new(0, 30, 0, 30) })
-				index4:Create(t19.Label.Instance:FindFirstChild("nig"), TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Position = UDim2.new(1, 26, 1, -6) }, true)
+				local targetChild = t19.Label.Instance:FindFirstChild("Indicator") or t19.Label.Instance:FindFirstChild("Icon")
+				if targetChild then
+					index4:Create(targetChild, TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Position = UDim2.new(1, 26, 1, -6) }, true)
+				end
 			end
 		end
 	end
