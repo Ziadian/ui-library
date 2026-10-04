@@ -160,20 +160,8 @@ index3.Themes = {
 		["Section Background 2"] = Color3.fromRGB(14, 14, 16),
 		Element = Color3.fromRGB(18, 18, 20),
 	},
-	["Supernova"] = {
-		Accent = Color3.fromRGB(168, 85, 255),
-		AccentGradient = Color3.fromRGB(0, 235, 255),
-		Background = Color3.fromRGB(7, 9, 16),
-		["Background 2"] = Color3.fromRGB(4, 6, 11),
-		Text = Color3.fromRGB(242, 246, 252),
-		Outline = Color3.fromRGB(32, 42, 62),
-		["Section Top"] = Color3.fromRGB(22, 28, 44),
-		["Section Background"] = Color3.fromRGB(8, 12, 21),
-		["Section Background 2"] = Color3.fromRGB(13, 18, 30),
-		Element = Color3.fromRGB(16, 22, 36),
-	},
 }
-index3.CurrentTheme = "Supernova"
+index3.CurrentTheme = "XDFLEX"
 
 local function ensureFolder(path)
 	if type(isfolder) ~= "function" or type(makefolder) ~= "function" then
@@ -1832,76 +1820,12 @@ index3.Window = function(arg, arg2)
 	}
 	local items = {
 		MainFrame = index5:Create("Frame", {
-			Parent = index3.Holder.Instance, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 0.08,
+			Parent = index3.Holder.Instance, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 0.12,
 			Position = UDim2.new(0.55199998617172241, 0, 0.5, 0), Size = UDim2.new(0, 680, 0, 590), ZIndex = 2,
-			BackgroundColor3 = Color3.fromRGB(7, 9, 16), ClipsDescendants = true,
+			BackgroundColor3 = Color3.fromRGB(27, 25, 29),
 		}),
 	}
 	items.MainFrame:AddToTheme({ BackgroundColor3 = "Background" })
-
-	-- Supernova Deep Space Layer (Layer 1: Space Nebula Wallpaper)
-	local defaultSpaceImage = resolveImageSource(t18.BackgroundImage or "122558509893976")
-	local defaultSpaceOpacity = tonumber(t18.BackgroundOpacity) or 0.22
-	items.SpaceBackground = index5:Create("ImageLabel", {
-		Parent = items.MainFrame.Instance,
-		Size = UDim2.new(1, 0, 1, 0),
-		Position = UDim2.new(0, 0, 0, 0),
-		BackgroundTransparency = 1,
-		Image = defaultSpaceImage,
-		ImageTransparency = 1 - defaultSpaceOpacity,
-		ScaleType = Enum.ScaleType.Crop,
-		ZIndex = 2,
-	})
-
-	-- Supernova Cosmic Vignette & Gradient Overlay (Layer 2: Contrast protector & Soft Cosmic Glow)
-	items.SpaceGradientOverlay = index5:Create("Frame", {
-		Parent = items.MainFrame.Instance,
-		Size = UDim2.new(1, 0, 1, 0),
-		Position = UDim2.new(0, 0, 0, 0),
-		BackgroundTransparency = 0.55,
-		BackgroundColor3 = Color3.fromRGB(5, 7, 14),
-		ZIndex = 2,
-	})
-	index5:Create("UIGradient", {
-		Parent = items.SpaceGradientOverlay.Instance,
-		Rotation = 45,
-		Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 12, 45)),
-			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(6, 8, 16)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 22, 38)),
-		}),
-	})
-
-	-- Supernova Stardust Glow (Layer 3: Cosmic Accent Border Glow)
-	items.MainFrameStroke = index5:Create("UIStroke", {
-		Parent = items.MainFrame.Instance,
-		Thickness = 1.4,
-		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-		Transparency = 0.15,
-		Color = Color3.fromRGB(168, 85, 255),
-	})
-	items.MainFrameStrokeGradient = index5:Create("UIGradient", {
-		Parent = items.MainFrameStroke.Instance,
-		Rotation = 45,
-		Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(168, 85, 255)),
-			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(70, 90, 140)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 235, 255)),
-		}),
-	})
-	items.MainFrameStrokeGradient:AddToTheme({
-		Color = function()
-			local accent = index3.Theme.Accent or Color3.fromRGB(168, 85, 255)
-			local grad = index3.Theme.AccentGradient or Color3.fromRGB(0, 235, 255)
-			local outline = index3.Theme.Outline or Color3.fromRGB(40, 50, 75)
-			return ColorSequence.new({
-				ColorSequenceKeypoint.new(0, accent),
-				ColorSequenceKeypoint.new(0.5, outline),
-				ColorSequenceKeypoint.new(1, grad),
-			})
-		end,
-	})
-
 	if touchEnabled then
 		items.UIScale = index5:Create("UIScale", { Parent = items.MainFrame.Instance, Scale = 0.69999998807907104 })
 	else
@@ -2231,38 +2155,15 @@ index3.Window = function(arg, arg2)
 	})
 	items.___12:AddToTheme({ BackgroundColor3 = "Background" })
 	t19.SetTransparency = function()
-		local val = tonumber(index3.Flags.BackgroundTransparency) or 0
-		items.MainFrame.Instance.BackgroundTransparency = math.clamp(0.08 + (val * 0.9), 0, 1)
-		items.LeftTabs.Instance.BackgroundTransparency = math.clamp(0.15 + (val * 0.8), 0, 1)
-		if items.SpaceGradientOverlay then
-			items.SpaceGradientOverlay.Instance.BackgroundTransparency = math.clamp(0.55 + (val * 0.4), 0, 1)
-		end
+		items.MainFrame.Instance.BackgroundTransparency = index3.Flags.BackgroundTransparency
+		items.LeftTabs.Instance.BackgroundTransparency = index3.Flags.BackgroundTransparency
 		if touchEnabled then
-			items.FloatingButton.Instance.BackgroundTransparency = val
+			items.FloatingButton.Instance.BackgroundTransparency = index3.Flags.BackgroundTransparency
 		end
 		for k_, v79 in items do
 			if k_:find("___") then
-				v79.Instance.BackgroundTransparency = val
+				v79.Instance.BackgroundTransparency = tonumber(index3.Flags.BackgroundTransparency)
 			end
-		end
-	end
-
-	t19.SetBackgroundImage = function(_, imgId)
-		if items.SpaceBackground and items.SpaceBackground.Instance then
-			items.SpaceBackground.Instance.Image = resolveImageSource(imgId)
-		end
-	end
-
-	t19.SetBackgroundOpacity = function(_, opacity)
-		if items.SpaceBackground and items.SpaceBackground.Instance then
-			local num = tonumber(opacity) or 0.22
-			items.SpaceBackground.Instance.ImageTransparency = math.clamp(1 - num, 0, 1)
-		end
-	end
-
-	t19.SetGlow = function(_, enabled)
-		if items.MainFrameStroke and items.MainFrameStroke.Instance then
-			items.MainFrameStroke.Instance.Enabled = enabled ~= false
 		end
 	end
 	index5:Create("UIGradient", {
@@ -2767,18 +2668,6 @@ index3.Window = function(arg, arg2)
 		Name = "Background Transparency", Default = 0, Decimals = 0.01, Max = 1, Min = 0, Suffix = "%", Flag = "BackgroundTransparency",
 		Callback = function(arg3)
 			t19:SetTransparency(arg3)
-		end,
-	})
-	t21:Slider({
-		Name = "Cosmic Nebula Opacity", Default = 22, Decimals = 1, Max = 100, Min = 0, Suffix = "%", Flag = "NebulaOpacity",
-		Callback = function(arg3)
-			t19:SetBackgroundOpacity(arg3 / 100)
-		end,
-	})
-	t21:Toggle({
-		Name = "Cosmic Stardust Glow", Default = true, Flag = "StardustGlowToggle",
-		Callback = function(enabled)
-			t19:SetGlow(enabled)
 		end,
 	})
 	local menuBind = t21:Keybind({
