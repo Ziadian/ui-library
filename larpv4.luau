@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.4.1-jarvis-ultra",
+	Version = "1.4.2-xdflex-theme",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -32,7 +32,7 @@ local index3 = {
 		Time = 0.3, Style = Enum.EasingStyle.Quad, Direction = Enum.EasingDirection.Out,
 	},
 	FadeSpeed = 0.2,
-	VisualStyle = "Jarvis Ultra",
+	VisualStyle = "XDFLEX Theme",
 		BootEffect = true,
 		BootDuration = 2.65,
 	Windows = {},
@@ -986,7 +986,7 @@ end
 -- Theme = palette. VisualStyle = motion / chrome / HUD language.
 -- ============================================================
 index3.VisualStyles = {
-	["Jarvis Ultra"] = {
+	["XDFLEX Theme"] = {
 		Ambient = true,
 		TopLine = true,
 		Scanline = true,
@@ -997,8 +997,10 @@ index3.VisualStyles = {
 		Particles = true,
 		HoloSweep = true,
 		Telemetry = true,
+		EdgeGlow = true,
+		Backplate = true,
 	},
-	["Jarvis Minimal"] = {
+	["XDFLEX Theme Lite"] = {
 		Ambient = true,
 		TopLine = true,
 		Scanline = true,
@@ -1006,15 +1008,11 @@ index3.VisualStyles = {
 		Brackets = true,
 		StatusChip = true,
 		Pulse = true,
-	},
-	["Minimal"] = {
-		Ambient = false,
-		TopLine = true,
-		Scanline = false,
-		Grid = false,
-		Brackets = false,
-		StatusChip = false,
-		Pulse = false,
+		Particles = false,
+		HoloSweep = false,
+		Telemetry = false,
+		EdgeGlow = true,
+		Backplate = true,
 	},
 	["Glass Core"] = {
 		Ambient = true,
@@ -1024,6 +1022,25 @@ index3.VisualStyles = {
 		Brackets = false,
 		StatusChip = true,
 		Pulse = true,
+		Particles = false,
+		HoloSweep = false,
+		Telemetry = false,
+		EdgeGlow = true,
+		Backplate = true,
+	},
+	["Minimal"] = {
+		Ambient = false,
+		TopLine = true,
+		Scanline = false,
+		Grid = false,
+		Brackets = false,
+		StatusChip = false,
+		Pulse = false,
+		Particles = false,
+		HoloSweep = false,
+		Telemetry = false,
+		EdgeGlow = false,
+		Backplate = true,
 	},
 }
 
@@ -1037,7 +1054,7 @@ index3.GetVisualStyleNames = function(arg)
 end
 
 index3.SetVisualStyle = function(arg, name)
-	name = tostring(name or "Jarvis Minimal")
+	name = tostring(name or "XDFLEX Theme")
 	if not arg.VisualStyles[name] then
 		return false
 	end
@@ -1084,11 +1101,11 @@ end
 
 
 -- ============================================================
--- XDFLEX JARVIS BOOT SEQUENCE
+-- XDFLEX THEME BOOT SEQUENCE
 -- Kept outside Window() so the main window constructor stays below
 -- Luau's local-register ceiling even as visual effects grow.
 -- ============================================================
-local function attachJarvisBoot(window, items)
+local function attachXDFLEXBoot(window, items)
 	if not (window and items and items.MainFrame and items.MainFrame.Instance) then
 		return
 	end
@@ -1199,7 +1216,7 @@ local function attachJarvisBoot(window, items)
 	end
 
 	local title = index5:Create("TextLabel", {
-		Parent = overlay.Instance, FontFace = index3.Font, Text = "XDFLEX // JARVIS CORE",
+		Parent = overlay.Instance, FontFace = index3.Font, Text = "XDFLEX // THEME CORE",
 		TextColor3 = index3.Theme.Text, TextTransparency = 0.06, BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.65, 0), Size = UDim2.new(0, 360, 0, 22),
 		TextSize = 17, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 160,
@@ -1207,7 +1224,7 @@ local function attachJarvisBoot(window, items)
 	title:AddToTheme({ TextColor3 = "Text" })
 
 	local status = index5:Create("TextLabel", {
-		Parent = overlay.Instance, FontFace = index3.Font, Text = "INITIALIZING SECURE INTERFACE...",
+		Parent = overlay.Instance, FontFace = index3.Font, Text = "INITIALIZING XDFLEX THEME...",
 		TextColor3 = index3.Theme.Text, TextTransparency = 0.38, BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.692, 0), Size = UDim2.new(0, 420, 0, 18),
 		TextSize = 11, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 160,
@@ -1249,7 +1266,7 @@ local function attachJarvisBoot(window, items)
 
 	local rightTelemetry = index5:Create("TextLabel", {
 		Parent = overlay.Instance, FontFace = index3.Font,
-		Text = "NEURAL UI\nENCRYPTED\nLATENCY  OK\nBUILD  1.4.1",
+		Text = "XDFLEX UI\nENCRYPTED\nLATENCY  OK\nBUILD  1.4.2",
 		TextColor3 = index3.Theme.Text, TextTransparency = 0.62, BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -22, 1, -82), Size = UDim2.new(0, 130, 0, 62),
 		TextSize = 9, TextXAlignment = Enum.TextXAlignment.Right, TextYAlignment = Enum.TextYAlignment.Bottom, ZIndex = 160,
@@ -2184,7 +2201,7 @@ index3.Window = function(arg, arg2)
 		Logo = resolveImageSource(t18.Logo or t18.logo or "79389153354922"),
 		MenuKeybind = resolveMenuKeybind(t18.Keybind or t18.keybind or t18.MenuKeybind or t18.menukeybind or index3.MenuKeybind),
 		ShowToggle = t18.ShowToggle ~= false,
-		Style = (index3.VisualStyles[tostring(t18.Style or t18.style or index3.VisualStyle)] and tostring(t18.Style or t18.style or index3.VisualStyle)) or "Jarvis Ultra",
+		Style = (index3.VisualStyles[tostring(t18.Style or t18.style or index3.VisualStyle)] and tostring(t18.Style or t18.style or index3.VisualStyle)) or "XDFLEX Theme",
 		BootEffect = t18.BootEffect ~= nil and t18.BootEffect == true or index3.BootEffect,
 		BootDuration = tonumber(t18.BootDuration) or index3.BootDuration or 2.65,
 		BootPlayed = false,
@@ -2439,23 +2456,68 @@ index3.Window = function(arg, arg2)
 		items.SubTitle.Instance.Text = tostring(arg4)
 	end
 	items.Content = index5:Create("Frame", {
-		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.75, Position = UDim2.new(0, 0, 0, 55), Size = UDim2.new(1, 0, 1, -55),
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.10, Position = UDim2.new(0, 0, 0, 55), Size = UDim2.new(1, 0, 1, -55),
 		ZIndex = 2, BackgroundColor3 = Color3.fromRGB(27, 27, 29),
 	})
 	items.Content:AddToTheme({ BackgroundColor3 = "Background" })
 
-	-- ===== Jarvis / Minimal visual layer =====
+	items.ContentBackplate = index5:Create("Frame", {
+		Parent = items.Content.Instance, BackgroundTransparency = 0.22, BorderSizePixel = 0,
+		Position = UDim2.new(0, 6, 0, 6), Size = UDim2.new(1, -12, 1, -12), ZIndex = 1,
+	})
+	items.ContentBackplate:AddToTheme({ BackgroundColor3 = "Background 2" })
+	index5:Create("UICorner", { Parent = items.ContentBackplate.Instance, CornerRadius = UDim.new(0, 6) })
+
+	items.LeftGlow = index5:Create("Frame", {
+		Parent = items.Content.Instance, BackgroundTransparency = 0.58, BorderSizePixel = 0,
+		Position = UDim2.new(0, -10, 0, 0), Size = UDim2.new(0, 132, 1, 0), ZIndex = 2,
+	})
+	local leftGlowGradient = index5:Create("UIGradient", {
+		Parent = items.LeftGlow.Instance, Rotation = 0,
+		Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.06),
+			NumberSequenceKeypoint.new(0.72, 0.82),
+			NumberSequenceKeypoint.new(1, 1),
+		}),
+	})
+	leftGlowGradient:AddToTheme({ Color = function()
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, index3.Theme.Accent),
+			ColorSequenceKeypoint.new(1, index3.Theme.Background),
+		})
+	end })
+
+	items.RightGlow = index5:Create("Frame", {
+		Parent = items.Content.Instance, AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.58, BorderSizePixel = 0,
+		Position = UDim2.new(1, 10, 0, 0), Size = UDim2.new(0, 132, 1, 0), ZIndex = 2,
+	})
+	local rightGlowGradient = index5:Create("UIGradient", {
+		Parent = items.RightGlow.Instance, Rotation = 180,
+		Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.06),
+			NumberSequenceKeypoint.new(0.72, 0.82),
+			NumberSequenceKeypoint.new(1, 1),
+		}),
+	})
+	rightGlowGradient:AddToTheme({ Color = function()
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, index3.Theme.AccentGradient),
+			ColorSequenceKeypoint.new(1, index3.Theme.Background),
+		})
+	end })
+
+	-- ===== XDFLEX THEME visual layer =====
 	items.MainStroke = index5:Create("UIStroke", {
 		Parent = items.MainFrame.Instance, Thickness = 1, Transparency = 0.55, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 	})
 	items.MainStroke:AddToTheme({ Color = "Outline" })
 
 	items.AmbientGradient = index5:Create("UIGradient", {
-		Parent = items.MainFrame.Instance, Rotation = 125,
+		Parent = items.MainFrame.Instance, Rotation = 90,
 		Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.84),
-			NumberSequenceKeypoint.new(0.5, 0.96),
-			NumberSequenceKeypoint.new(1, 0.86),
+			NumberSequenceKeypoint.new(0, 0.92),
+			NumberSequenceKeypoint.new(0.5, 0.975),
+			NumberSequenceKeypoint.new(1, 0.92),
 		}),
 	})
 	items.AmbientGradient:AddToTheme({ Color = function()
@@ -2584,7 +2646,7 @@ index3.Window = function(arg, arg2)
 	end
 
 	items.DataParticles = {}
-	for particleIndex = 1, 8 do
+	for particleIndex = 1, 12 do
 		local particle = index5:Create("Frame", {
 			Parent = items.Content.Instance, Size = UDim2.new(0, particleIndex % 3 == 0 and 3 or 2, 0, particleIndex % 3 == 0 and 3 or 2),
 			Position = UDim2.new((particleIndex * 0.119) % 0.9 + 0.04, 0, ((particleIndex * 0.173) % 0.8) + 0.08, 0),
@@ -2596,7 +2658,7 @@ index3.Window = function(arg, arg2)
 	end
 
 	t19.SetVisualStyle = function(arg3, styleName)
-		styleName = tostring(styleName or "Jarvis Minimal")
+		styleName = tostring(styleName or "XDFLEX Theme")
 		local style = index3.VisualStyles[styleName]
 		if not style then
 			return false
@@ -2610,16 +2672,27 @@ index3.Window = function(arg, arg2)
 		items.StatusChip.Instance.Visible = style.StatusChip == true
 		items.HoloSweep.Instance.Visible = style.HoloSweep == true
 		items.TelemetryRail.Instance.Visible = style.Telemetry == true
+		items.LeftGlow.Instance.Visible = style.EdgeGlow == true
+		items.RightGlow.Instance.Visible = style.EdgeGlow == true
+		items.ContentBackplate.Instance.Visible = style.Backplate ~= false
 		for _, particle in ipairs(items.DataParticles) do
 			particle.Instance.Visible = style.Particles == true
 		end
-		items.MainStroke.Instance.Transparency = styleName == "Minimal" and 0.78 or (styleName == "Jarvis Ultra" and 0.28 or 0.48)
-		items.StatusText.Instance.Text = styleName == "Jarvis Ultra" and "JARVIS • ULTRA" or (styleName == "Jarvis Minimal" and "JARVIS • READY" or (styleName == "Glass Core" and "GLASS • ONLINE" or "MINIMAL"))
+		items.MainStroke.Instance.Transparency = styleName == "Minimal" and 0.78 or (styleName == "XDFLEX Theme" and 0.22 or 0.42)
+		if styleName == "XDFLEX Theme" then
+			items.StatusText.Instance.Text = "XDFLEX THEME"
+		elseif styleName == "XDFLEX Theme Lite" then
+			items.StatusText.Instance.Text = "XDFLEX LITE"
+		elseif styleName == "Glass Core" then
+			items.StatusText.Instance.Text = "GLASS • ONLINE"
+		else
+			items.StatusText.Instance.Text = "MINIMAL"
+		end
 		return true
 	end
 
 	t19:SetVisualStyle(t19.Style)
-	attachJarvisBoot(t19, items)
+	attachXDFLEXBoot(t19, items)
 
 	index3:Thread(function()
 		while not index3.Destroyed and items.MainFrame.Instance.Parent do
@@ -2637,7 +2710,7 @@ index3.Window = function(arg, arg2)
 
 			if style.Scanline and items.Scanline.Instance.Visible then
 				items.Scanline.Instance.Position = UDim2.new(0, 8, 0, 0)
-				local scanTween = TweenService:Create(items.Scanline.Instance, TweenInfo.new(t19.Style == "Jarvis Ultra" and 2.55 or 3.4, Enum.EasingStyle.Linear), {
+				local scanTween = TweenService:Create(items.Scanline.Instance, TweenInfo.new(t19.Style == "XDFLEX Theme" and 2.35 or 3.2, Enum.EasingStyle.Linear), {
 					Position = UDim2.new(0, 8, 1, -2),
 				})
 				scanTween:Play()
@@ -2680,16 +2753,32 @@ index3.Window = function(arg, arg2)
 				local ping = 0
 				pcall(function() fps = math.floor(workspace:GetRealPhysicsFPS() + 0.5) end)
 				pcall(function() ping = math.floor(localPlayer:GetNetworkPing() * 1000 + 0.5) end)
-				if t19.Style == "Jarvis Ultra" then
-					items.StatusText.Instance.Text = string.format("JARVIS • %dFPS • %dMS", fps, ping)
-				elseif t19.Style == "Jarvis Minimal" then
-					items.StatusText.Instance.Text = "JARVIS • READY"
+				if t19.Style == "XDFLEX Theme" then
+					items.StatusText.Instance.Text = string.format("XDFLEX • %dFPS • %dMS", fps, ping)
+				elseif t19.Style == "XDFLEX Theme Lite" then
+					items.StatusText.Instance.Text = "XDFLEX • READY"
 				elseif t19.Style == "Glass Core" then
 					items.StatusText.Instance.Text = "GLASS • ONLINE"
 				end
 			end
 
-			task.wait(t19.Style == "Jarvis Ultra" and 0.75 or 1.2)
+			if style.EdgeGlow then
+				items.LeftGlow:Tween(TweenInfo.new(0.55, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					BackgroundTransparency = 0.46,
+				})
+				items.RightGlow:Tween(TweenInfo.new(0.55, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					BackgroundTransparency = 0.46,
+				})
+				task.wait(0.28)
+				items.LeftGlow:Tween(TweenInfo.new(0.55, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					BackgroundTransparency = 0.58,
+				})
+				items.RightGlow:Tween(TweenInfo.new(0.55, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					BackgroundTransparency = 0.58,
+				})
+			end
+
+			task.wait(t19.Style == "XDFLEX Theme" and 0.72 or 1.15)
 		end
 	end)
 
