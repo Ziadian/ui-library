@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.4.0-jarvis",
+	Version = "1.4.1-jarvis-ultra",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -32,7 +32,9 @@ local index3 = {
 		Time = 0.3, Style = Enum.EasingStyle.Quad, Direction = Enum.EasingDirection.Out,
 	},
 	FadeSpeed = 0.2,
-	VisualStyle = "Jarvis Minimal",
+	VisualStyle = "Jarvis Ultra",
+		BootEffect = true,
+		BootDuration = 2.65,
 	Windows = {},
 	Folders = {
 		Directory = "XDFLEX_UI",
@@ -984,6 +986,18 @@ end
 -- Theme = palette. VisualStyle = motion / chrome / HUD language.
 -- ============================================================
 index3.VisualStyles = {
+	["Jarvis Ultra"] = {
+		Ambient = true,
+		TopLine = true,
+		Scanline = true,
+		Grid = true,
+		Brackets = true,
+		StatusChip = true,
+		Pulse = true,
+		Particles = true,
+		HoloSweep = true,
+		Telemetry = true,
+	},
 	["Jarvis Minimal"] = {
 		Ambient = true,
 		TopLine = true,
@@ -1059,7 +1073,282 @@ index3.Configure = function(arg, options)
 	if options.Style and arg.VisualStyles[tostring(options.Style)] then
 		arg.VisualStyle = tostring(options.Style)
 	end
+	if options.BootEffect ~= nil then
+		arg.BootEffect = options.BootEffect == true
+	end
+	if tonumber(options.BootDuration) then
+		arg.BootDuration = math.clamp(tonumber(options.BootDuration), 0.8, 6)
+	end
 	return arg
+end
+
+
+-- ============================================================
+-- XDFLEX JARVIS BOOT SEQUENCE
+-- Kept outside Window() so the main window constructor stays below
+-- Luau's local-register ceiling even as visual effects grow.
+-- ============================================================
+local function attachJarvisBoot(window, items)
+	if not (window and items and items.MainFrame and items.MainFrame.Instance) then
+		return
+	end
+
+	local overlay = index5:Create("CanvasGroup", {
+		Parent = items.MainFrame.Instance,
+		Name = "XDFLEX_BOOT",
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundTransparency = 0.02,
+		BackgroundColor3 = index3.Theme.Background,
+		GroupTransparency = 1,
+		ZIndex = 150,
+	})
+	overlay:AddToTheme({ BackgroundColor3 = "Background" })
+	index5:Create("UICorner", { Parent = overlay.Instance, CornerRadius = UDim.new(0, 7) })
+
+	local bgGradient = index5:Create("UIGradient", {
+		Parent = overlay.Instance,
+		Rotation = 125,
+		Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.12),
+			NumberSequenceKeypoint.new(0.45, 0.72),
+			NumberSequenceKeypoint.new(1, 0.18),
+		}),
+	})
+	bgGradient:AddToTheme({ Color = function()
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, index3.Theme.Accent),
+			ColorSequenceKeypoint.new(0.48, index3.Theme.Background),
+			ColorSequenceKeypoint.new(1, index3.Theme.AccentGradient),
+		})
+	end })
+
+	local bootGrid = index5:Create("Frame", {
+		Parent = overlay.Instance, BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0), ZIndex = 151,
+	})
+	for n = 1, 8 do
+		local line = index5:Create("Frame", {
+			Parent = bootGrid.Instance, BorderSizePixel = 0, BackgroundTransparency = 0.93,
+			Position = UDim2.new(n / 9, 0, 0, 0), Size = UDim2.new(0, 1, 1, 0), ZIndex = 151,
+		})
+		line:AddToTheme({ BackgroundColor3 = n % 2 == 0 and "Accent" or "AccentGradient" })
+	end
+	for n = 1, 5 do
+		local line = index5:Create("Frame", {
+			Parent = bootGrid.Instance, BorderSizePixel = 0, BackgroundTransparency = 0.945,
+			Position = UDim2.new(0, 0, n / 6, 0), Size = UDim2.new(1, 0, 0, 1), ZIndex = 151,
+		})
+		line:AddToTheme({ BackgroundColor3 = n % 2 == 0 and "AccentGradient" or "Accent" })
+	end
+
+	local bootScan = index5:Create("Frame", {
+		Parent = overlay.Instance, BorderSizePixel = 0, BackgroundTransparency = 0.38,
+		Position = UDim2.new(0, 24, 0, 0), Size = UDim2.new(1, -48, 0, 2), ZIndex = 160,
+	})
+	local bootScanGradient = index5:Create("UIGradient", { Parent = bootScan.Instance, Rotation = 0 })
+	bootScanGradient:AddToTheme({ Color = function()
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, index3.Theme.Accent),
+			ColorSequenceKeypoint.new(0.5, index3.Theme.AccentGradient),
+			ColorSequenceKeypoint.new(1, index3.Theme.Accent),
+		})
+	end })
+
+	local core = index5:Create("Frame", {
+		Parent = overlay.Instance, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.42, 0),
+		Size = UDim2.new(0, 250, 0, 250), BackgroundTransparency = 1, ZIndex = 155,
+	})
+
+	local ringOuter = index5:Create("Frame", {
+		Parent = core.Instance, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, 146, 0, 146), BackgroundTransparency = 1, ZIndex = 155,
+	})
+	index5:Create("UICorner", { Parent = ringOuter.Instance, CornerRadius = UDim.new(1, 0) })
+	local ringOuterStroke = index5:Create("UIStroke", {
+		Parent = ringOuter.Instance, Thickness = 2, Transparency = 0.28, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	ringOuterStroke:AddToTheme({ Color = "Accent" })
+
+	local ringInner = index5:Create("Frame", {
+		Parent = core.Instance, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, 116, 0, 116), BackgroundTransparency = 1, ZIndex = 156,
+	})
+	index5:Create("UICorner", { Parent = ringInner.Instance, CornerRadius = UDim.new(1, 0) })
+	local ringInnerStroke = index5:Create("UIStroke", {
+		Parent = ringInner.Instance, Thickness = 1, Transparency = 0.42, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	ringInnerStroke:AddToTheme({ Color = "AccentGradient" })
+
+	local logo = index5:Create("ImageLabel", {
+		Parent = core.Instance, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, 82, 0, 82), Image = window.Logo, BackgroundTransparency = 1,
+		ScaleType = Enum.ScaleType.Crop, ZIndex = 158,
+	})
+	index5:Create("UICorner", { Parent = logo.Instance, CornerRadius = UDim.new(1, 0) })
+
+	for n = 1, 12 do
+		local tick = index5:Create("Frame", {
+			Parent = core.Instance, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(0, n % 3 == 0 and 2 or 1, 0, n % 3 == 0 and 18 or 11),
+			Rotation = (n - 1) * 30, BackgroundTransparency = n % 3 == 0 and 0.2 or 0.52,
+			BorderSizePixel = 0, ZIndex = 157,
+		})
+		tick.Instance.Position = UDim2.new(0.5, math.sin(math.rad((n - 1) * 30)) * 89, 0.5, -math.cos(math.rad((n - 1) * 30)) * 89)
+		tick:AddToTheme({ BackgroundColor3 = n % 2 == 0 and "AccentGradient" or "Accent" })
+	end
+
+	local title = index5:Create("TextLabel", {
+		Parent = overlay.Instance, FontFace = index3.Font, Text = "XDFLEX // JARVIS CORE",
+		TextColor3 = index3.Theme.Text, TextTransparency = 0.06, BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.65, 0), Size = UDim2.new(0, 360, 0, 22),
+		TextSize = 17, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 160,
+	})
+	title:AddToTheme({ TextColor3 = "Text" })
+
+	local status = index5:Create("TextLabel", {
+		Parent = overlay.Instance, FontFace = index3.Font, Text = "INITIALIZING SECURE INTERFACE...",
+		TextColor3 = index3.Theme.Text, TextTransparency = 0.38, BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.692, 0), Size = UDim2.new(0, 420, 0, 18),
+		TextSize = 11, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 160,
+	})
+	status:AddToTheme({ TextColor3 = "Text" })
+
+	local progressBack = index5:Create("Frame", {
+		Parent = overlay.Instance, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.75, 0),
+		Size = UDim2.new(0, 330, 0, 4), BackgroundTransparency = 0.64, BorderSizePixel = 0, ZIndex = 160,
+	})
+	progressBack:AddToTheme({ BackgroundColor3 = "Outline" })
+	index5:Create("UICorner", { Parent = progressBack.Instance, CornerRadius = UDim.new(1, 0) })
+
+	local progressFill = index5:Create("Frame", {
+		Parent = progressBack.Instance, Size = UDim2.new(0, 0, 1, 0), BackgroundTransparency = 0,
+		BorderSizePixel = 0, ZIndex = 161,
+	})
+	index5:Create("UICorner", { Parent = progressFill.Instance, CornerRadius = UDim.new(1, 0) })
+	local progressGradient = index5:Create("UIGradient", { Parent = progressFill.Instance, Rotation = 0 })
+	progressGradient:AddToTheme({ Color = function()
+		return ColorSequence.new(index3.Theme.Accent, index3.Theme.AccentGradient)
+	end })
+
+	local percent = index5:Create("TextLabel", {
+		Parent = overlay.Instance, FontFace = index3.Font, Text = "00%", TextColor3 = index3.Theme.Text,
+		TextTransparency = 0.25, BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0.775, 0), Size = UDim2.new(0, 100, 0, 18), TextSize = 11, ZIndex = 160,
+	})
+	percent:AddToTheme({ TextColor3 = "Text" })
+
+	local leftTelemetry = index5:Create("TextLabel", {
+		Parent = overlay.Instance, FontFace = index3.Font,
+		Text = "CORE  01\nLINK  SECURE\nMEM   READY\nAUTH  XDFLEX",
+		TextColor3 = index3.Theme.Text, TextTransparency = 0.62, BackgroundTransparency = 1,
+		Position = UDim2.new(0, 22, 1, -82), Size = UDim2.new(0, 130, 0, 62),
+		TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Bottom, ZIndex = 160,
+	})
+	leftTelemetry:AddToTheme({ TextColor3 = "Text" })
+
+	local rightTelemetry = index5:Create("TextLabel", {
+		Parent = overlay.Instance, FontFace = index3.Font,
+		Text = "NEURAL UI\nENCRYPTED\nLATENCY  OK\nBUILD  1.4.1",
+		TextColor3 = index3.Theme.Text, TextTransparency = 0.62, BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -22, 1, -82), Size = UDim2.new(0, 130, 0, 62),
+		TextSize = 9, TextXAlignment = Enum.TextXAlignment.Right, TextYAlignment = Enum.TextYAlignment.Bottom, ZIndex = 160,
+	})
+	rightTelemetry:AddToTheme({ TextColor3 = "Text" })
+
+	local bootParticles = {}
+	for n = 1, 10 do
+		local dot = index5:Create("Frame", {
+			Parent = overlay.Instance, Size = UDim2.new(0, n % 3 == 0 and 3 or 2, 0, n % 3 == 0 and 3 or 2),
+			Position = UDim2.new((n * 0.087) % 0.9 + 0.05, 0, 0.86 - (n % 4) * 0.16, 0),
+			BackgroundTransparency = 0.35 + (n % 4) * 0.12, BorderSizePixel = 0, ZIndex = 159,
+		})
+		dot:AddToTheme({ BackgroundColor3 = n % 2 == 0 and "Accent" or "AccentGradient" })
+		index5:Create("UICorner", { Parent = dot.Instance, CornerRadius = UDim.new(1, 0) })
+		bootParticles[n] = dot
+	end
+
+	items.BootOverlay = overlay
+	items.BootStatus = status
+	items.BootProgress = progressFill
+	items.BootPercent = percent
+
+	window.PlayBootSequence = function(self)
+		if self.BootPlayed then
+			return false
+		end
+		self.BootPlayed = true
+
+		if self.BootEffect == false then
+			overlay.Instance.Visible = false
+			return true
+		end
+
+		task.spawn(function()
+			local ok, err = pcall(function()
+				if index3.Destroyed or not overlay.Instance.Parent then
+					return
+				end
+				overlay.Instance.Visible = true
+				overlay.Instance.GroupTransparency = 1
+				progressFill.Instance.Size = UDim2.new(0, 0, 1, 0)
+				bootScan.Instance.Position = UDim2.new(0, 24, 0, 0)
+
+				local duration = math.clamp(tonumber(self.BootDuration) or index3.BootDuration or 2.65, 0.8, 6)
+				local intro = TweenService:Create(overlay.Instance, TweenInfo.new(0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { GroupTransparency = 0 })
+				intro:Play()
+
+				TweenService:Create(bootScan.Instance, TweenInfo.new(duration * 0.78, Enum.EasingStyle.Linear), {
+					Position = UDim2.new(0, 24, 1, -2),
+				}):Play()
+				TweenService:Create(ringOuter.Instance, TweenInfo.new(duration, Enum.EasingStyle.Linear), { Rotation = 180 }):Play()
+				TweenService:Create(ringInner.Instance, TweenInfo.new(duration, Enum.EasingStyle.Linear), { Rotation = -220 }):Play()
+				TweenService:Create(logo.Instance, TweenInfo.new(0.42, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Size = UDim2.new(0, 94, 0, 94) }):Play()
+
+				for n, dot in ipairs(bootParticles) do
+					local dx = ((n % 2 == 0) and 1 or -1) * (10 + n * 2)
+					local target = UDim2.new(dot.Instance.Position.X.Scale, dx, math.max(0.08, dot.Instance.Position.Y.Scale - 0.23), -10)
+					TweenService:Create(dot.Instance, TweenInfo.new(duration * (0.55 + (n % 4) * 0.07), Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
+						Position = target, BackgroundTransparency = 0.88,
+					}):Play()
+				end
+
+				local steps = {
+					{ 0.18, "BOOTSTRAPPING CORE MODULES..." },
+					{ 0.39, "SYNCING INPUT / RENDER PIPELINE..." },
+					{ 0.63, "CALIBRATING HOLOGRAPHIC INTERFACE..." },
+					{ 0.84, "SECURE CHANNEL ESTABLISHED..." },
+					{ 1.00, "SYSTEM READY // WELCOME BACK" },
+				}
+				local stepTime = math.max(0.12, duration * 0.72 / #steps)
+				for _, step in ipairs(steps) do
+					if index3.Destroyed or not overlay.Instance.Parent then
+						return
+					end
+					status.Instance.Text = step[2]
+					percent.Instance.Text = string.format("%02d%%", math.floor(step[1] * 100 + 0.5))
+					TweenService:Create(progressFill.Instance, TweenInfo.new(stepTime * 0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+						Size = UDim2.new(step[1], 0, 1, 0),
+					}):Play()
+					task.wait(stepTime)
+				end
+
+				TweenService:Create(logo.Instance, TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Size = UDim2.new(0, 86, 0, 86) }):Play()
+				task.wait(math.max(0.08, duration * 0.08))
+				local outro = TweenService:Create(overlay.Instance, TweenInfo.new(0.34, Enum.EasingStyle.Quint, Enum.EasingDirection.In), { GroupTransparency = 1 })
+				outro:Play()
+				outro.Completed:Wait()
+			end)
+
+			if not ok then
+				warn("[XDFLEX UI] boot effect skipped:", err)
+			end
+			if overlay.Instance and overlay.Instance.Parent then
+				overlay.Instance.Visible = false
+			end
+		end)
+		return true
+	end
 end
 
 index3.ChangeItemTheme = function(arg, arg2, properties)
@@ -1895,7 +2184,10 @@ index3.Window = function(arg, arg2)
 		Logo = resolveImageSource(t18.Logo or t18.logo or "79389153354922"),
 		MenuKeybind = resolveMenuKeybind(t18.Keybind or t18.keybind or t18.MenuKeybind or t18.menukeybind or index3.MenuKeybind),
 		ShowToggle = t18.ShowToggle ~= false,
-		Style = (index3.VisualStyles[tostring(t18.Style or t18.style or index3.VisualStyle)] and tostring(t18.Style or t18.style or index3.VisualStyle)) or "Jarvis Minimal",
+		Style = (index3.VisualStyles[tostring(t18.Style or t18.style or index3.VisualStyle)] and tostring(t18.Style or t18.style or index3.VisualStyle)) or "Jarvis Ultra",
+		BootEffect = t18.BootEffect ~= nil and t18.BootEffect == true or index3.BootEffect,
+		BootDuration = tonumber(t18.BootDuration) or index3.BootDuration or 2.65,
+		BootPlayed = false,
 		Pages = {}, Items = {}, IsOpen = false, CurrentAlignment = "LeftTabs",
 	}
 	local items = {
@@ -2150,7 +2442,7 @@ index3.Window = function(arg, arg2)
 		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.75, Position = UDim2.new(0, 0, 0, 55), Size = UDim2.new(1, 0, 1, -55),
 		ZIndex = 2, BackgroundColor3 = Color3.fromRGB(27, 27, 29),
 	})
-\titems.Content:AddToTheme({ BackgroundColor3 = "Background" })
+	items.Content:AddToTheme({ BackgroundColor3 = "Background" })
 
 	-- ===== Jarvis / Minimal visual layer =====
 	items.MainStroke = index5:Create("UIStroke", {
@@ -2264,6 +2556,45 @@ index3.Window = function(arg, arg2)
 	})
 	items.StatusText:AddToTheme({ TextColor3 = "Text" })
 
+	items.HoloSweep = index5:Create("Frame", {
+		Parent = items.Content.Instance, Position = UDim2.new(0, -70, 0, 0), Size = UDim2.new(0, 54, 1, 0),
+		BackgroundTransparency = 0.94, BorderSizePixel = 0, ZIndex = 2, Visible = false,
+	})
+	local holoGradient = index5:Create("UIGradient", {
+		Parent = items.HoloSweep.Instance, Rotation = 0,
+		Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.5, 0.25), NumberSequenceKeypoint.new(1, 1),
+		}),
+	})
+	holoGradient:AddToTheme({ Color = function()
+		return ColorSequence.new(index3.Theme.Accent, index3.Theme.AccentGradient)
+	end })
+
+	items.TelemetryRail = index5:Create("Frame", {
+		Parent = items.MainFrame.Instance, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -5, 0.5, 0),
+		Size = UDim2.new(0, 8, 0, 150), BackgroundTransparency = 1, ZIndex = 21, Visible = false,
+	})
+	for tickIndex = 1, 11 do
+		local tick = index5:Create("Frame", {
+			Parent = items.TelemetryRail.Instance, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, (tickIndex - 1) / 10, 0),
+			Size = UDim2.new(0, tickIndex % 5 == 1 and 7 or 3, 0, 1), BackgroundTransparency = tickIndex % 5 == 1 and 0.18 or 0.58,
+			BorderSizePixel = 0, ZIndex = 21,
+		})
+		tick:AddToTheme({ BackgroundColor3 = tickIndex % 2 == 0 and "AccentGradient" or "Accent" })
+	end
+
+	items.DataParticles = {}
+	for particleIndex = 1, 8 do
+		local particle = index5:Create("Frame", {
+			Parent = items.Content.Instance, Size = UDim2.new(0, particleIndex % 3 == 0 and 3 or 2, 0, particleIndex % 3 == 0 and 3 or 2),
+			Position = UDim2.new((particleIndex * 0.119) % 0.9 + 0.04, 0, ((particleIndex * 0.173) % 0.8) + 0.08, 0),
+			BackgroundTransparency = 0.74, BorderSizePixel = 0, ZIndex = 2, Visible = false,
+		})
+		particle:AddToTheme({ BackgroundColor3 = particleIndex % 2 == 0 and "Accent" or "AccentGradient" })
+		index5:Create("UICorner", { Parent = particle.Instance, CornerRadius = UDim.new(1, 0) })
+		items.DataParticles[particleIndex] = particle
+	end
+
 	t19.SetVisualStyle = function(arg3, styleName)
 		styleName = tostring(styleName or "Jarvis Minimal")
 		local style = index3.VisualStyles[styleName]
@@ -2277,38 +2608,92 @@ index3.Window = function(arg, arg2)
 		items.TechGrid.Instance.Visible = style.Grid == true
 		items.Brackets.Instance.Visible = style.Brackets == true
 		items.StatusChip.Instance.Visible = style.StatusChip == true
-		items.MainStroke.Instance.Transparency = styleName == "Minimal" and 0.78 or 0.48
-		items.StatusText.Instance.Text = styleName == "Jarvis Minimal" and "JARVIS • READY" or (styleName == "Glass Core" and "GLASS • ONLINE" or "MINIMAL")
+		items.HoloSweep.Instance.Visible = style.HoloSweep == true
+		items.TelemetryRail.Instance.Visible = style.Telemetry == true
+		for _, particle in ipairs(items.DataParticles) do
+			particle.Instance.Visible = style.Particles == true
+		end
+		items.MainStroke.Instance.Transparency = styleName == "Minimal" and 0.78 or (styleName == "Jarvis Ultra" and 0.28 or 0.48)
+		items.StatusText.Instance.Text = styleName == "Jarvis Ultra" and "JARVIS • ULTRA" or (styleName == "Jarvis Minimal" and "JARVIS • READY" or (styleName == "Glass Core" and "GLASS • ONLINE" or "MINIMAL"))
 		return true
 	end
 
 	t19:SetVisualStyle(t19.Style)
+	attachJarvisBoot(t19, items)
 
 	index3:Thread(function()
 		while not index3.Destroyed and items.MainFrame.Instance.Parent do
 			local style = index3.VisualStyles[t19.Style]
-			if style and style.Scanline and items.Scanline.Instance.Visible then
+			if not style then
+				task.wait(0.8)
+				continue
+			end
+
+			if items.AmbientGradient and items.AmbientGradient.Instance.Enabled then
+				items.AmbientGradient:Tween(TweenInfo.new(2.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					Rotation = items.AmbientGradient.Instance.Rotation > 180 and 125 or 305,
+				})
+			end
+
+			if style.Scanline and items.Scanline.Instance.Visible then
 				items.Scanline.Instance.Position = UDim2.new(0, 8, 0, 0)
-				local tween = TweenService:Create(items.Scanline.Instance, TweenInfo.new(3.4, Enum.EasingStyle.Linear), {
+				local scanTween = TweenService:Create(items.Scanline.Instance, TweenInfo.new(t19.Style == "Jarvis Ultra" and 2.55 or 3.4, Enum.EasingStyle.Linear), {
 					Position = UDim2.new(0, 8, 1, -2),
 				})
-				tween:Play()
-				tween.Completed:Wait()
+				scanTween:Play()
+				scanTween.Completed:Wait()
 			else
-				task.wait(0.6)
-			end
-			if style and style.Pulse then
-				items.TechTopLine:Tween(TweenInfo.new(0.45, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.45 })
-				items.StatusDot:Tween(TweenInfo.new(0.45, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Size = UDim2.new(0, 9, 0, 9), BackgroundTransparency = 0.15 })
 				task.wait(0.45)
-				items.TechTopLine:Tween(TweenInfo.new(0.45, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.12 })
-				items.StatusDot:Tween(TweenInfo.new(0.45, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Size = UDim2.new(0, 6, 0, 6), BackgroundTransparency = 0 })
 			end
-			task.wait(1.2)
+
+			if style.HoloSweep and items.HoloSweep.Instance.Visible then
+				items.HoloSweep.Instance.Position = UDim2.new(0, -70, 0, 0)
+				local holoTween = TweenService:Create(items.HoloSweep.Instance, TweenInfo.new(1.15, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					Position = UDim2.new(1, 24, 0, 0),
+				})
+				holoTween:Play()
+			end
+
+			if style.Particles then
+				for particleIndex, particle in ipairs(items.DataParticles) do
+					if particle.Instance.Visible then
+						local x = ((particleIndex * 0.137 + os.clock() * 0.011) % 0.92) + 0.03
+						local y = ((particleIndex * 0.193 + os.clock() * 0.018) % 0.82) + 0.07
+						particle:Tween(TweenInfo.new(1.6 + (particleIndex % 3) * 0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+							Position = UDim2.new(x, 0, y, 0),
+							BackgroundTransparency = 0.55 + (particleIndex % 3) * 0.1,
+						})
+					end
+				end
+			end
+
+			if style.Pulse then
+				items.TechTopLine:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.46 })
+				items.StatusDot:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Size = UDim2.new(0, 9, 0, 9), BackgroundTransparency = 0.12 })
+				task.wait(0.38)
+				items.TechTopLine:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.10 })
+				items.StatusDot:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Size = UDim2.new(0, 6, 0, 6), BackgroundTransparency = 0 })
+			end
+
+			if items.StatusChip.Instance.Visible then
+				local fps = 0
+				local ping = 0
+				pcall(function() fps = math.floor(workspace:GetRealPhysicsFPS() + 0.5) end)
+				pcall(function() ping = math.floor(localPlayer:GetNetworkPing() * 1000 + 0.5) end)
+				if t19.Style == "Jarvis Ultra" then
+					items.StatusText.Instance.Text = string.format("JARVIS • %dFPS • %dMS", fps, ping)
+				elseif t19.Style == "Jarvis Minimal" then
+					items.StatusText.Instance.Text = "JARVIS • READY"
+				elseif t19.Style == "Glass Core" then
+					items.StatusText.Instance.Text = "GLASS • ONLINE"
+				end
+			end
+
+			task.wait(t19.Style == "Jarvis Ultra" and 0.75 or 1.2)
 		end
 	end)
 
-\titems.CloseButton = index5:Create("TextButton", {
+	items.CloseButton = index5:Create("TextButton", {
 		Parent = items.MainFrame.Instance, FontFace = index3.Font, TextColor3 = Color3.fromRGB(0, 0, 0), Text = "", AutoButtonColor = false,
 		AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.20000000298023224, Position = UDim2.new(1, -14, 0, 11),
 		Size = UDim2.new(0, 32, 0, 32), ZIndex = 2, TextSize = 14, BackgroundColor3 = Color3.fromRGB(27, 27, 29),
@@ -2993,11 +3378,16 @@ index3.Window = function(arg, arg2)
 		t19:Toggle()
 	end)
 	t19.Init = function()
+		if type(t19.PlayBootSequence) == "function" then
+			pcall(t19.PlayBootSequence, t19)
+		end
 		for _, v80 in t19.Pages do
 			if v80.Active then
-				for _, v81 in v80.Sections do
-					task.spawn(function()
-						v81:TweenElements(true)
+				for sectionIndex, v81 in ipairs(v80.Sections) do
+				task.delay(math.min((sectionIndex - 1) * 0.045, 0.22), function()
+						if not index3.Destroyed then
+							v81:TweenElements(true)
+						end
 					end)
 				end
 			end
