@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.4.3-xdflex-glass",
+	Version = "1.4.4-xdflex-fullframe",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -2464,15 +2464,15 @@ index3.Window = function(arg, arg2)
 	items.Content:AddToTheme({ BackgroundColor3 = "Background" })
 
 	items.ContentBackplate = index5:Create("Frame", {
-		Parent = items.Content.Instance, BackgroundTransparency = 0.52, BorderSizePixel = 0,
-		Position = UDim2.new(0, 6, 0, 6), Size = UDim2.new(1, -12, 1, -12), ZIndex = 1,
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.58, BorderSizePixel = 0,
+		Position = UDim2.new(0, 6, 0, 6), Size = UDim2.new(1, -12, 1, -12), ZIndex = 3,
 	})
 	items.ContentBackplate:AddToTheme({ BackgroundColor3 = "Background 2" })
 	index5:Create("UICorner", { Parent = items.ContentBackplate.Instance, CornerRadius = UDim.new(0, 6) })
 
 	items.LeftGlow = index5:Create("Frame", {
-		Parent = items.Content.Instance, BackgroundTransparency = 0.58, BorderSizePixel = 0,
-		Position = UDim2.new(0, -10, 0, 0), Size = UDim2.new(0, 132, 1, 0), ZIndex = 2,
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.72, BorderSizePixel = 0,
+		Position = UDim2.new(0, -18, 0, -10), Size = UDim2.new(0, 160, 1, 20), ZIndex = 1,
 	})
 	local leftGlowGradient = index5:Create("UIGradient", {
 		Parent = items.LeftGlow.Instance, Rotation = 0,
@@ -2490,8 +2490,8 @@ index3.Window = function(arg, arg2)
 	end })
 
 	items.RightGlow = index5:Create("Frame", {
-		Parent = items.Content.Instance, AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.58, BorderSizePixel = 0,
-		Position = UDim2.new(1, 10, 0, 0), Size = UDim2.new(0, 132, 1, 0), ZIndex = 2,
+		Parent = items.MainFrame.Instance, AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.72, BorderSizePixel = 0,
+		Position = UDim2.new(1, 18, 0, -10), Size = UDim2.new(0, 160, 1, 20), ZIndex = 1,
 	})
 	local rightGlowGradient = index5:Create("UIGradient", {
 		Parent = items.RightGlow.Instance, Rotation = 180,
@@ -2509,7 +2509,7 @@ index3.Window = function(arg, arg2)
 	end })
 
 	items.GlassVeil = index5:Create("Frame", {
-		Parent = items.Content.Instance, BackgroundTransparency = 0.86, BorderSizePixel = 0,
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.89, BorderSizePixel = 0,
 		Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(1, 0, 1, 0), ZIndex = 2,
 	})
 	local glassVeilGradient = index5:Create("UIGradient", {
@@ -2575,6 +2575,26 @@ index3.Window = function(arg, arg2)
 			ColorSequenceKeypoint.new(1, index3.Theme.AccentGradient),
 		})
 	end })
+
+	items.FullFrameShell = index5:Create("Frame", {
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 1, Position = UDim2.new(0, -2, 0, -2),
+		Size = UDim2.new(1, 4, 1, 4), ZIndex = 24,
+	})
+	index5:Create("UICorner", { Parent = items.FullFrameShell.Instance, CornerRadius = UDim.new(0, 12) })
+	local fullShellStroke = index5:Create("UIStroke", {
+		Parent = items.FullFrameShell.Instance, Thickness = 1.6, Transparency = 0.28, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	fullShellStroke:AddToTheme({ Color = "Accent" })
+
+	items.FullFrameShellGlow = index5:Create("Frame", {
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 1, Position = UDim2.new(0, -8, 0, -8),
+		Size = UDim2.new(1, 16, 1, 16), ZIndex = 0,
+	})
+	index5:Create("UICorner", { Parent = items.FullFrameShellGlow.Instance, CornerRadius = UDim.new(0, 16) })
+	local fullGlowStroke = index5:Create("UIStroke", {
+		Parent = items.FullFrameShellGlow.Instance, Thickness = 3, Transparency = 0.76, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	fullGlowStroke:AddToTheme({ Color = "AccentGradient" })
 
 	items.CornerFX = {}
 	local cornerFXSpecs = {
@@ -2676,14 +2696,14 @@ index3.Window = function(arg, arg2)
 		Parent = items.MainFrame.Instance, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0), ZIndex = 21,
 	})
 	local bracketSpecs = {
-		{ UDim2.new(0, 6, 0, 6), UDim2.new(0, 22, 0, 1) },
-		{ UDim2.new(0, 6, 0, 6), UDim2.new(0, 1, 0, 22) },
-		{ UDim2.new(1, -28, 0, 6), UDim2.new(0, 22, 0, 1) },
-		{ UDim2.new(1, -7, 0, 6), UDim2.new(0, 1, 0, 22) },
-		{ UDim2.new(0, 6, 1, -7), UDim2.new(0, 22, 0, 1) },
-		{ UDim2.new(0, 6, 1, -28), UDim2.new(0, 1, 0, 22) },
-		{ UDim2.new(1, -28, 1, -7), UDim2.new(0, 22, 0, 1) },
-		{ UDim2.new(1, -7, 1, -28), UDim2.new(0, 1, 0, 22) },
+		{ UDim2.new(0, -2, 0, -2), UDim2.new(0, 30, 0, 2) },
+		{ UDim2.new(0, -2, 0, -2), UDim2.new(0, 2, 0, 30) },
+		{ UDim2.new(1, -28, 0, -2), UDim2.new(0, 30, 0, 2) },
+		{ UDim2.new(1, -2, 0, -2), UDim2.new(0, 2, 0, 30) },
+		{ UDim2.new(0, -2, 1, -2), UDim2.new(0, 30, 0, 2) },
+		{ UDim2.new(0, -2, 1, -28), UDim2.new(0, 2, 0, 30) },
+		{ UDim2.new(1, -28, 1, -2), UDim2.new(0, 30, 0, 2) },
+		{ UDim2.new(1, -2, 1, -28), UDim2.new(0, 2, 0, 30) },
 	}
 	for _, spec in ipairs(bracketSpecs) do
 		local bracket = index5:Create("Frame", {
@@ -2775,6 +2795,8 @@ index3.Window = function(arg, arg2)
 		items.RightGlow.Instance.Visible = style.EdgeGlow == true
 		items.BorderGlow.Instance.Visible = style.EdgeGlow == true
 		items.InnerBorder.Instance.Visible = style.EdgeGlow == true
+		items.FullFrameShell.Instance.Visible = style.EdgeGlow == true
+		items.FullFrameShellGlow.Instance.Visible = style.EdgeGlow == true
 		items.TopAura.Instance.Visible = style.EdgeGlow == true
 		items.BottomAura.Instance.Visible = style.EdgeGlow == true
 		items.GlassVeil.Instance.Visible = style.Backplate ~= false
@@ -2855,6 +2877,12 @@ index3.Window = function(arg, arg2)
 				if items.BorderGlow and items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke") then
 					items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.42
 				end
+				if items.FullFrameShell and items.FullFrameShell.Instance:FindFirstChildOfClass("UIStroke") then
+					items.FullFrameShell.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.10
+				end
+				if items.FullFrameShellGlow and items.FullFrameShellGlow.Instance:FindFirstChildOfClass("UIStroke") then
+					items.FullFrameShellGlow.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.56
+				end
 				task.wait(0.38)
 				items.TechTopLine:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.10 })
 				items.StatusDot:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Size = UDim2.new(0, 6, 0, 6), BackgroundTransparency = 0 })
@@ -2862,6 +2890,12 @@ index3.Window = function(arg, arg2)
 				items.BottomAura:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.62 })
 				if items.BorderGlow and items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke") then
 					items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.68
+				end
+				if items.FullFrameShell and items.FullFrameShell.Instance:FindFirstChildOfClass("UIStroke") then
+					items.FullFrameShell.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.28
+				end
+				if items.FullFrameShellGlow and items.FullFrameShellGlow.Instance:FindFirstChildOfClass("UIStroke") then
+					items.FullFrameShellGlow.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.76
 				end
 			end
 
