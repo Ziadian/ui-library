@@ -23,7 +23,7 @@ local touchEnabled = UserInputService.TouchEnabled or false
 
 local index3 = {
 	Name = "XDFLEX UI",
-	Version = "1.4.2-xdflex-theme",
+	Version = "1.4.3-xdflex-glass",
 	Theme = {},
 	MenuKeybind = Enum.KeyCode.RightControl,
 	Flags = {},
@@ -2209,7 +2209,7 @@ index3.Window = function(arg, arg2)
 	}
 	local items = {
 		MainFrame = index5:Create("Frame", {
-			Parent = index3.Holder.Instance, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 0.12,
+			Parent = index3.Holder.Instance, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 0.28,
 			Position = UDim2.new(0.55199998617172241, 0, 0.5, 0), Size = UDim2.new(0, 680, 0, 590), ZIndex = 2,
 			BackgroundColor3 = Color3.fromRGB(27, 25, 29),
 		}),
@@ -2310,13 +2310,15 @@ index3.Window = function(arg, arg2)
 	items.MainFrame:MakeResizeable(Vector2.new(items.MainFrame.Instance.AbsoluteSize.X, items.MainFrame.Instance.AbsoluteSize.Y), Vector2.new(9999, 9999), nil)
 	index3:MakeBlurred(items.MainFrame, t19)
 	items.LeftTabs = index5:Create("ScrollingFrame", {
-		Parent = items.MainFrame.Instance, Visible = true, AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.15,
+		Parent = items.MainFrame.Instance, Visible = true, AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 0.34,
 		Size = UDim2.new(0, 203, 1, 0), ZIndex = 2, BackgroundColor3 = Color3.fromRGB(27, 25, 29),
 		Active = true, ScrollBarThickness = 2, AutomaticCanvasSize = Enum.AutomaticSize.Y,
 		CanvasSize = UDim2.new(0, 0, 0, 0), ElasticBehavior = Enum.ElasticBehavior.WhenScrollable,
 		ScrollBarImageTransparency = 0.4, BorderSizePixel = 0,
 	})
 	items.LeftTabs:AddToTheme({ BackgroundColor3 = "Background", ScrollBarImageColor3 = "Accent" })
+	local leftTabsStroke = index5:Create("UIStroke", { Parent = items.LeftTabs.Instance, Thickness = 1, Transparency = 0.72, ApplyStrokeMode = Enum.ApplyStrokeMode.Border })
+	leftTabsStroke:AddToTheme({ Color = "Accent" })
 	index3:MakeBlurred(items.LeftTabs, t19)
 	local instance = items.MainFrame.Instance
 	local b15 = false
@@ -2456,13 +2458,13 @@ index3.Window = function(arg, arg2)
 		items.SubTitle.Instance.Text = tostring(arg4)
 	end
 	items.Content = index5:Create("Frame", {
-		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.10, Position = UDim2.new(0, 0, 0, 55), Size = UDim2.new(1, 0, 1, -55),
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.32, Position = UDim2.new(0, 0, 0, 55), Size = UDim2.new(1, 0, 1, -55),
 		ZIndex = 2, BackgroundColor3 = Color3.fromRGB(27, 27, 29),
 	})
 	items.Content:AddToTheme({ BackgroundColor3 = "Background" })
 
 	items.ContentBackplate = index5:Create("Frame", {
-		Parent = items.Content.Instance, BackgroundTransparency = 0.22, BorderSizePixel = 0,
+		Parent = items.Content.Instance, BackgroundTransparency = 0.52, BorderSizePixel = 0,
 		Position = UDim2.new(0, 6, 0, 6), Size = UDim2.new(1, -12, 1, -12), ZIndex = 1,
 	})
 	items.ContentBackplate:AddToTheme({ BackgroundColor3 = "Background 2" })
@@ -2505,6 +2507,103 @@ index3.Window = function(arg, arg2)
 			ColorSequenceKeypoint.new(1, index3.Theme.Background),
 		})
 	end })
+
+	items.GlassVeil = index5:Create("Frame", {
+		Parent = items.Content.Instance, BackgroundTransparency = 0.86, BorderSizePixel = 0,
+		Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(1, 0, 1, 0), ZIndex = 2,
+	})
+	local glassVeilGradient = index5:Create("UIGradient", {
+		Parent = items.GlassVeil.Instance, Rotation = 35,
+		Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.12),
+			NumberSequenceKeypoint.new(0.45, 0.55),
+			NumberSequenceKeypoint.new(1, 0.18),
+		}),
+	})
+	glassVeilGradient:AddToTheme({ Color = function()
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(0.5, index3.Theme.Accent),
+			ColorSequenceKeypoint.new(1, index3.Theme.AccentGradient),
+		})
+	end })
+
+	items.BorderGlow = index5:Create("Frame", {
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 1, Position = UDim2.new(0, -10, 0, -10),
+		Size = UDim2.new(1, 20, 1, 20), ZIndex = 1,
+	})
+	local borderGlowStroke = index5:Create("UIStroke", {
+		Parent = items.BorderGlow.Instance, Thickness = 2, Transparency = 0.68, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	borderGlowStroke:AddToTheme({ Color = "Accent" })
+	index5:Create("UICorner", { Parent = items.BorderGlow.Instance, CornerRadius = UDim.new(0, 14) })
+
+	items.InnerBorder = index5:Create("Frame", {
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 1, Position = UDim2.new(0, 5, 0, 5),
+		Size = UDim2.new(1, -10, 1, -10), ZIndex = 22,
+	})
+	local innerBorderStroke = index5:Create("UIStroke", {
+		Parent = items.InnerBorder.Instance, Thickness = 1, Transparency = 0.75, ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	innerBorderStroke:AddToTheme({ Color = "AccentGradient" })
+	index5:Create("UICorner", { Parent = items.InnerBorder.Instance, CornerRadius = UDim.new(0, 10) })
+
+	items.TopAura = index5:Create("Frame", {
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.5, BorderSizePixel = 0,
+		Position = UDim2.new(0, 16, 0, -2), Size = UDim2.new(1, -32, 0, 6), ZIndex = 23,
+	})
+	index5:Create("UICorner", { Parent = items.TopAura.Instance, CornerRadius = UDim.new(1, 0) })
+	local topAuraGradient = index5:Create("UIGradient", { Parent = items.TopAura.Instance, Rotation = 0 })
+	topAuraGradient:AddToTheme({ Color = function()
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, index3.Theme.Accent),
+			ColorSequenceKeypoint.new(0.5, index3.Theme.AccentGradient),
+			ColorSequenceKeypoint.new(1, index3.Theme.Accent),
+		})
+	end })
+
+	items.BottomAura = index5:Create("Frame", {
+		Parent = items.MainFrame.Instance, BackgroundTransparency = 0.62, BorderSizePixel = 0,
+		Position = UDim2.new(0, 24, 1, -4), Size = UDim2.new(1, -48, 0, 4), ZIndex = 23,
+	})
+	index5:Create("UICorner", { Parent = items.BottomAura.Instance, CornerRadius = UDim.new(1, 0) })
+	local bottomAuraGradient = index5:Create("UIGradient", { Parent = items.BottomAura.Instance, Rotation = 0 })
+	bottomAuraGradient:AddToTheme({ Color = function()
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, index3.Theme.AccentGradient),
+			ColorSequenceKeypoint.new(0.5, index3.Theme.Accent),
+			ColorSequenceKeypoint.new(1, index3.Theme.AccentGradient),
+		})
+	end })
+
+	items.CornerFX = {}
+	local cornerFXSpecs = {
+		{ name = "TL", pos = UDim2.new(0, -8, 0, -8), anchor = Vector2.new(0, 0), rot = 0 },
+		{ name = "TR", pos = UDim2.new(1, 8, 0, -8), anchor = Vector2.new(1, 0), rot = 90 },
+		{ name = "BL", pos = UDim2.new(0, -8, 1, 8), anchor = Vector2.new(0, 1), rot = -90 },
+		{ name = "BR", pos = UDim2.new(1, 8, 1, 8), anchor = Vector2.new(1, 1), rot = 180 },
+	}
+	for _, spec in ipairs(cornerFXSpecs) do
+		local corner = index5:Create("Frame", {
+			Parent = items.MainFrame.Instance, BackgroundTransparency = 0.35, BorderSizePixel = 0,
+			Position = spec.pos, AnchorPoint = spec.anchor, Size = UDim2.new(0, 44, 0, 44), ZIndex = 24,
+		})
+		local grad = index5:Create("UIGradient", {
+			Parent = corner.Instance, Rotation = spec.rot,
+			Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 0.10),
+				NumberSequenceKeypoint.new(0.46, 0.62),
+				NumberSequenceKeypoint.new(1, 1),
+			}),
+		})
+		grad:AddToTheme({ Color = function()
+			return ColorSequence.new({
+				ColorSequenceKeypoint.new(0, index3.Theme.Accent),
+				ColorSequenceKeypoint.new(1, index3.Theme.Background),
+			})
+		end })
+		items.CornerFX[spec.name] = corner
+	end
 
 	-- ===== XDFLEX THEME visual layer =====
 	items.MainStroke = index5:Create("UIStroke", {
@@ -2674,11 +2773,19 @@ index3.Window = function(arg, arg2)
 		items.TelemetryRail.Instance.Visible = style.Telemetry == true
 		items.LeftGlow.Instance.Visible = style.EdgeGlow == true
 		items.RightGlow.Instance.Visible = style.EdgeGlow == true
+		items.BorderGlow.Instance.Visible = style.EdgeGlow == true
+		items.InnerBorder.Instance.Visible = style.EdgeGlow == true
+		items.TopAura.Instance.Visible = style.EdgeGlow == true
+		items.BottomAura.Instance.Visible = style.EdgeGlow == true
+		items.GlassVeil.Instance.Visible = style.Backplate ~= false
 		items.ContentBackplate.Instance.Visible = style.Backplate ~= false
+		for _, corner in pairs(items.CornerFX) do
+			corner.Instance.Visible = style.EdgeGlow == true
+		end
 		for _, particle in ipairs(items.DataParticles) do
 			particle.Instance.Visible = style.Particles == true
 		end
-		items.MainStroke.Instance.Transparency = styleName == "Minimal" and 0.78 or (styleName == "XDFLEX Theme" and 0.22 or 0.42)
+		items.MainStroke.Instance.Transparency = styleName == "Minimal" and 0.82 or (styleName == "XDFLEX Theme" and 0.16 or 0.34)
 		if styleName == "XDFLEX Theme" then
 			items.StatusText.Instance.Text = "XDFLEX THEME"
 		elseif styleName == "XDFLEX Theme Lite" then
@@ -2743,9 +2850,19 @@ index3.Window = function(arg, arg2)
 			if style.Pulse then
 				items.TechTopLine:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.46 })
 				items.StatusDot:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Size = UDim2.new(0, 9, 0, 9), BackgroundTransparency = 0.12 })
+				items.TopAura:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.18 })
+				items.BottomAura:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.28 })
+				if items.BorderGlow and items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke") then
+					items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.42
+				end
 				task.wait(0.38)
 				items.TechTopLine:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.10 })
 				items.StatusDot:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Size = UDim2.new(0, 6, 0, 6), BackgroundTransparency = 0 })
+				items.TopAura:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.50 })
+				items.BottomAura:Tween(TweenInfo.new(0.38, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { BackgroundTransparency = 0.62 })
+				if items.BorderGlow and items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke") then
+					items.BorderGlow.Instance:FindFirstChildOfClass("UIStroke").Transparency = 0.68
+				end
 			end
 
 			if items.StatusChip.Instance.Visible then
